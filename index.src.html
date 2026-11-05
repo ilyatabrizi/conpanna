@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Coffee Conpanna · کافه کن‌پانا</title>
+<meta name="description" content="Coffee Conpanna — Tabriz and Esfahan. Order for delivery or takeaway, check in at your branch, collect stamps and book events.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#F7F2EC" id="theme-color">
+<meta name="color-scheme" content="light dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Conpanna">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Coffee Conpanna">
+<meta property="og:description" content="Bu Tat Senin. Order ahead, check in, and book events at Conpanna.">
+<meta property="og:url" content="https://ilyatabrizi.github.io/conpanna/">
+<meta property="og:image" content="https://ilyatabrizi.github.io/conpanna/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icons/favicon-32.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="preload" href="assets/fonts/fraunces-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/yekan.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/app.css?v=__V__">
+<script>
+  (function () {
+    var d = document.documentElement, pref = "system", warm = false, calm = false;
+    try { var s = JSON.parse(localStorage.getItem("conpanna.v1") || "{}"); pref = s.theme || "system"; calm = !!(s.prefs && s.prefs.reduceMotion); } catch (e) {}
+    try { warm = sessionStorage.getItem("conpanna.booted") === "1"; } catch (e) {}
+    var lang = "fa"; try { lang = localStorage.getItem("conpanna.lang") || ((navigator.language || "").toLowerCase().indexOf("fa") === 0 ? "fa" : "en"); } catch (e) {}
+    d.lang = lang; d.dir = lang === "fa" ? "rtl" : "ltr";
+    var dark = pref === "dark" || (pref !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+    d.setAttribute("data-theme", pref);
+    d.setAttribute("data-mode", dark ? "dark" : "light");
+    var m = document.getElementById("theme-color");
+    if (m) m.setAttribute("content", dark ? "#110B08" : "#F7F2EC");
+    d.className += " booting" + (warm ? " boot-warm" : "") + (calm ? " calm" : "");
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    setTimeout(function () { var b = document.getElementById("boot"); if (b) { b.parentNode.removeChild(b); d.classList.remove("booting"); } }, 9000);
+  })();
+</script>
+<script src="js/qr.js?v=__V__" defer></script>
+__PRELOAD__
+<script type="module" src="js/app.js?v=__V__"></script>
+</head>
+<body>
+
+<!-- Opening: the cup draws itself, fills, the name wipes in — and Alpha's mark beneath it. -->
+<div id="boot" aria-hidden="true" dir="ltr">
+  <div class="boot-in">
+    __LOCKUP__
+    <div class="boot-sig"><span>Powered by Alpha Agency</span><img class="sig-light" src="assets/brand/alpha-black.png" alt=""><img class="sig-dark" src="assets/brand/alpha-white.png" alt=""></div>
+  </div>
+</div>
+
+<!-- the goo filter that turns blurred circles into liquid -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="goo" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur in="SourceGraphic" stdDeviation="22" result="b"/><feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -11" result="g"/><feComposite in="SourceGraphic" in2="g" operator="atop"/></filter>
+</svg>
+
+<header id="bar" class="bar">
+  <button class="bar-btn" id="bar-back" type="button" aria-label="Back" hidden></button>
+  <a class="bar-logo" id="bar-logo" href="#/" aria-label="Coffee Conpanna — home"></a>
+  <span class="bar-title" id="bar-title" aria-hidden="true"></span>
+  <div class="bar-right">
+    <button class="bar-btn bar-lang" id="bar-lang" type="button"></button>
+    <button class="bar-btn" id="bar-bell" type="button" aria-label="Notifications"><span class="bell-dot" id="bell-dot"></span></button>
+  </div>
+</header>
+
+<main id="view" class="view"></main>
+<div id="dock"></div>
+
+<nav id="tabbar" class="tabbar" aria-label="Primary" data-tone="light" dir="ltr">
+  <div class="tabs" id="tabs">
+    <span class="tabs-lens" aria-hidden="true"></span>
+    <div class="tabs-row" id="tabs-row">
+      <a class="tab" draggable="false" data-tab="home" href="#/"><span class="tab-ico"></span><span class="tab-l">Home</span></a>
+      <a class="tab" draggable="false" data-tab="menu" href="#/menu"><span class="tab-ico"></span><span class="tab-l">Menu</span></a>
+      <a class="tab" draggable="false" data-tab="checkin" href="#/checkin"><span class="tab-ico"></span><span class="tab-l">Check-in</span></a>
+      <a class="tab" draggable="false" data-tab="events" href="#/events"><span class="tab-ico"></span><span class="tab-l">Events</span></a>
+      <a class="tab" draggable="false" data-tab="profile" href="#/profile"><span class="tab-ico"></span><span class="tab-l">Profile</span></a>
+    </div>
+  </div>
+  <a class="bag-btn" id="bag-btn" href="#/bag" aria-label="Bag"><span id="bag-ico"></span><span class="bag-l">Bag</span><span class="tab-badge" id="bag-badge" aria-hidden="true"></span></a>
+</nav>
+
+<div id="sheet-root"></div>
+<div id="toast-root" aria-live="polite" aria-atomic="true"></div>
+<noscript><p style="padding:24px;font:15px/1.5 system-ui">Coffee Conpanna needs JavaScript to run.</p></noscript>
+</body>
+</html>

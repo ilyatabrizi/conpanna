@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Conpanna · Owner panel</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#F7F2EC" id="theme-color">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/icons/favicon-32.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="preload" href="assets/fonts/fraunces-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/yekan.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/app.css?v=91ad126c86">
+<link rel="stylesheet" href="css/admin.css?v=91ad126c86">
+<script>
+  (function () {
+    var d = document.documentElement, pref = "system";
+    try { var s = JSON.parse(localStorage.getItem("conpanna.v1") || "{}"); pref = s.theme || "system"; } catch (e) {}
+    var lang = "fa"; try { lang = localStorage.getItem("conpanna.lang") || ((navigator.language || "").toLowerCase().indexOf("fa") === 0 ? "fa" : "en"); } catch (e) {}
+    d.lang = lang; d.dir = lang === "fa" ? "rtl" : "ltr";
+    var dark = pref === "dark" || (pref !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+    d.setAttribute("data-theme", pref); d.setAttribute("data-mode", dark ? "dark" : "light");
+    d.className += " admin-page";
+  })();
+</script>
+<script type="module" src="js/admin/admin.js?v=91ad126c86"></script>
+</head>
+<body>
+<noscript><p style="padding:24px;font:15px/1.5 system-ui">The owner panel needs JavaScript.</p></noscript>
+</body>
+</html>
