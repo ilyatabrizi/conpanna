@@ -8,7 +8,8 @@ An installable preview of a Coffee Conpanna app, built by Alpha Agency from Conp
 - Pages: Home · Menu · Check-in · Events · Profile, plus Bag, Order tracking, Orders, Rewards and Settings
 - Ordering: Delivery or Takeaway from the four branches (Tabriz Valiasr, ElahiParast, Aseman, Esfahan), options, "goes well with" pairings, vouchers, promo codes, stamp rewards, preview payment, live tracking
 - Club (CRM): Crema / Panna / Gold Panna tiers, points, stamp card, vouchers (welcome, birthday, referral, campaign), invite codes, monthly challenge, gift a coffee, "your usual"
-- Owner panel: dashboard, live order board, menu availability and prices, customer segments and profiles, campaigns, automations, loyalty rules, events, reviews, branch pause
+- CEO panel (پنل مدیرعامل): dashboard and alerts, live order board, sales (heat map, payment and channel mix, discounts), P&L with VAT, payroll, rent and expense entry, monthly goals with projection, 7-day forecast and a price what-if, menu engineering, customer insight (RFM groups, cohorts, churn, LTV), branch comparison and pause, inventory with purchase orders, suppliers and waste, staff performance, shift grid and payroll, service quality, checklists and maintenance, scheduled reports, Excel exports and a print pack, roles and permissions with an audit log, plus menu, customers, campaigns, automations, loyalty, events and reviews
+- Panel history: four months of seeded demo data (js/admin/seed.js) across the five branches
 - App ↔ panel sync: on one device the two talk instantly (`js/hub.js`); a real server replaces that file for production
 - Build: `python3 build.py` before every deploy (stamps versions, inlines the opening logo, writes index.html, admin.html and sw.js)
 

@@ -25,20 +25,20 @@ export default function checkin(el) {
     const visits = s.checkins.slice(0, 6);
     el.innerHTML = `
     <div class="wrap narrow page-top">
-      <div class="page-head"><div><h1 class="lt">${L("Check in", "ورود به کافه")}</h1><p class="small">${L("Tell us you're here: a stamp and points for your card, the Wi-Fi, and your order brought to your table.", "بگویید رسیدید: مهر و امتیاز برای کارتتان، رمز وای‌فای و سفارشی که سر میز می‌آید.")}</p></div></div>
+      <div class="page-head"><div><h1 class="lt">${L("Check in", "ورود به کافه")}</h1><p class="small">${L("Tell us you're here: a stamp and points for your card, the Wi-Fi, and your order brought to your table.", "بگو رسیدی: مهر و امتیاز برای کارتت، رمز وای‌فای و سفارشی که سر میز میاد.")}</p></div></div>
       ${cur ? `
       <section class="here">
-        <div class="here-top"><div><p class="eyebrow">${L("You're checked in – since", "حضور ثبت شد – از ساعت")} ${fmtTime(new Date(cur.at))}</p><h2>${L("Conpanna", "کن‌پانا")} ${esc(loc(b))}</h2></div><span class="dot pulse" style="margin-top:8px"></span></div>
+        <div class="here-top"><div><p class="eyebrow">${L("You're checked in – since", "اینجایی – از ساعت")} ${fmtTime(new Date(cur.at))}</p><h2>${L("Conpanna", "کن‌پانا")} ${esc(loc(b))}</h2></div><span class="dot pulse" style="margin-top:8px"></span></div>
         <p class="small" style="margin-top:6px">${esc(loc(b, "note"))}</p>
         <div class="here-grid">
-          <button type="button" id="wifi">${icon("wifi")}<b>${L("Wi-Fi", "وای‌فای")}</b><span class="lat">${BRAND.wifi.ssid}</span><span>${L("tap to copy password", "برای کپی رمز بزنید")}</span></button>
-          <button type="button" id="table">${icon("table")}<b>${cur.table ? L(`Table ${cur.table}`, `میز ${digits(cur.table)}`) : L("Your table", "میز شما")}</b><span>${cur.table ? L("Tap to change", "برای تغییر بزنید") : L("Add it and we'll bring your order", "شماره‌ی میز را بزنید تا سفارش را بیاوریم")}</span></button>
-          <a href="#/menu" id="order-seat">${icon("menu")}<b>${L("Order from your seat", "سفارش از سر میز")}</b><span>${L("Skip the queue at the counter", "بدون صف صندوق")}</span></a>
-          <button type="button" id="out">${icon("door")}<b>${L("Check out", "خروج")}</b><span>${L("Leaving? See you soon", "دارید می‌روید؟ به امید دیدار")}</span></button>
+          <button type="button" id="wifi">${icon("wifi")}<b>${L("Wi-Fi", "وای‌فای")}</b><span class="lat">${BRAND.wifi.ssid}</span><span>${L("tap to copy password", "بزن تا رمز کپی بشه")}</span></button>
+          <button type="button" id="table">${icon("table")}<b>${cur.table ? L(`Table ${cur.table}`, `میز ${digits(cur.table)}`) : L("Your table", "میزت")}</b><span>${cur.table ? L("Tap to change", "بزن تا عوضش کنی") : L("Add it and we'll bring your order", "شماره‌ی میزت رو بزن تا سفارش رو بیاریم سر میز")}</span></button>
+          <a href="#/menu" id="order-seat">${icon("menu")}<b>${L("Order from your seat", "سفارش از سر میز")}</b><span>${L("Skip the queue at the counter", "بی‌صف صندوق")}</span></a>
+          <button type="button" id="out">${icon("door")}<b>${L("Check out", "خروج")}</b><span>${L("Leaving? See you soon", "داری می‌ری؟ می‌بینیمت")}</span></button>
         </div>
       </section>` : `
       <section>
-        <p class="group-label" style="margin-top:0">${L("Where are you?", "کجا هستید؟")}</p>
+        <p class="group-label" style="margin-top:0">${L("Where are you?", "کجایی؟")}</p>
         <div class="branch-pick" id="picks">${BRANCHES.map((x) => { const o = openState(x), v = busy(x); return `
           <button class="bp" type="button" data-b="${x.id}" aria-pressed="${x.id === pick}">
             <b>${esc(loc(x))}</b><span class="city">${esc(loc(x, "city"))}</span>
@@ -46,16 +46,16 @@ export default function checkin(el) {
             <span class="st"><span class="dot ${o.isOpen ? "" : "off"}"></span>${o.isOpen ? busyLabel(v) : o.label}</span>
           </button>`; }).join("")}</div>
         <div class="hold-wrap">
-          <button class="hold" id="hold" type="button" aria-label="${L("Hold to check in", "برای ورود نگه دارید")}">
+          <button class="hold" id="hold" type="button" aria-label="${L("Hold to check in", "برای ورود نگه دار")}">
             <span class="liq">${WAVE}</span>
-            <span class="hold-in">${icon("checkin")}<b>${L("Hold to check in", "برای ورود نگه دارید")}</b><span id="hold-at">${L("at", "در")} ${esc(loc(b))}</span></span>
+            <span class="hold-in">${icon("checkin")}<b>${L("Hold to check in", "برای ورود نگه دار")}</b><span id="hold-at">${L("at", "تو")} ${esc(loc(b))}</span></span>
           </button>
-          <p class="tiny" style="margin-top:16px;text-align:center">${L(`Press and hold until the cup fills – +1 stamp – +${POINTS.perCheckin} points`, `نگه دارید تا فنجان پر شود – +۱ مهر – +${num(POINTS.perCheckin)} امتیاز`)}</p>
+          <p class="tiny" style="margin-top:16px;text-align:center">${L(`Press and hold until the cup fills – +1 stamp – +${POINTS.perCheckin} points`, `نگه دار تا فنجون پر شه – +۱ مهر – +${num(POINTS.perCheckin)} امتیاز`)}</p>
         </div>
       </section>`}
 
       <section style="margin-top:30px">
-        <div class="sec"><h2>${L("Your card", "کارت شما")}</h2></div>
+        <div class="sec"><h2>${L("Your card", "کارتت")}</h2></div>
         ${clubCard(s)}
       </section>
 
@@ -77,17 +77,17 @@ export default function checkin(el) {
     haptic(25);
     const hb = $("#hold", el)?.getBoundingClientRect();
     if (hb) burst(hb.left + hb.width / 2, hb.top + hb.height / 2);
-    notify({ title: L(`Welcome to Conpanna ${b.name}`, `به کن‌پانا ${b.name_fa} خوش آمدید`), body: L(`${stamp ? "+1 stamp. " : ""}Wi-Fi: ${BRAND.wifi.ssid} – ${BRAND.wifi.pass}`, `${stamp ? "+۱ مهر. " : ""}وای‌فای: ${BRAND.wifi.ssid} – ${BRAND.wifi.pass}`), cat: "checkin", url: "#/checkin" });
+    notify({ title: L(`Welcome to Conpanna ${b.name}`, `به کن‌پانا ${b.name_fa} خوش اومدی`), body: L(`${stamp ? "+1 stamp. " : ""}Wi-Fi: ${BRAND.wifi.ssid} – ${BRAND.wifi.pass}`, `${stamp ? "+۱ مهر. " : ""}وای‌فای: ${BRAND.wifi.ssid} – ${BRAND.wifi.pass}`), cat: "checkin", url: "#/checkin" });
     paint();
-    if (tierUp) celebrate({ icon: "crown", title: L(`Welcome to ${tierUp.name}`, `به سطح ${tierUp.name_fa} خوش آمدید`), body: L(tierUp.perks.join(" – "), tierUp.perks_fa.join(" – ")), cta: L("See your perks", "دیدن مزایا"), href: "#/rewards" });
-    else toast(earned ? L("Card full — a free drink is yours", "کارت پر شد؛ یک نوشیدنی رایگان مال شماست") : stamp ? L("Checked in – +1 stamp", "ورود ثبت شد – +۱ مهر") : L("Checked in – stamp already collected today", "ورود ثبت شد – مهر امروز قبلاً گرفته شده"), earned ? "gift" : "check");
+    if (tierUp) celebrate({ icon: "crown", title: L(`Welcome to ${tierUp.name}`, `به سطح ${tierUp.name_fa} خوش اومدی`), body: L(tierUp.perks.join(" – "), tierUp.perks_fa.join(" – ")), cta: L("See your perks", "دیدن مزایا"), href: "#/rewards" });
+    else toast(earned ? L("Card full — a free drink is yours", "کارت پر شد؛ یه نوشیدنی رایگان مال توئه") : stamp ? L("Checked in – +1 stamp", "ورودت ثبت شد – +۱ مهر") : L("Checked in – stamp already collected today", "ورودت ثبت شد – مهر امروز رو قبلاً گرفتی"), earned ? "gift" : "check");
   }
 
   function wire() {
     $$(".bp", el).forEach((x) => x.addEventListener("click", () => {
       pick = x.dataset.b;
       $$(".bp", el).forEach((y) => y.setAttribute("aria-pressed", y === x ? "true" : "false"));
-      $("#hold-at", el).textContent = `${L("at", "در")} ${loc(branch(pick))}`;
+      $("#hold-at", el).textContent = `${L("at", "تو")} ${loc(branch(pick))}`;
       haptic(5);
     }));
     const hold = $("#hold", el);
@@ -102,7 +102,7 @@ export default function checkin(el) {
         draw(); raf = requestAnimationFrame(step);
       };
       hold.addEventListener("pointerdown", (e) => { if (e.button > 0) return; e.preventDefault(); pressing = true; t0 = performance.now() - fill * HOLD_MS; hold.classList.add("pressing"); haptic(6); try { hold.setPointerCapture(e.pointerId); } catch (err) {} cancelAnimationFrame(raf); raf = requestAnimationFrame(step); });
-      const stop = () => { if (!pressing) return; pressing = false; hold.classList.remove("pressing"); if (fill < 1) toast(L("Keep holding until the cup is full", "نگه دارید تا فنجان پر شود"), "info"); cancelAnimationFrame(raf); raf = requestAnimationFrame(step); };
+      const stop = () => { if (!pressing) return; pressing = false; hold.classList.remove("pressing"); if (fill < 1) toast(L("Keep holding until the cup is full", "نگه دار تا فنجون پر شه"), "info"); cancelAnimationFrame(raf); raf = requestAnimationFrame(step); };
       hold.addEventListener("pointerup", stop);
       hold.addEventListener("pointercancel", stop);
       hold.addEventListener("contextmenu", (e) => e.preventDefault());
@@ -115,9 +115,9 @@ export default function checkin(el) {
     });
     $("#table", el)?.addEventListener("click", () => {
       const cur = get().current;
-      sheet(`<h2>${L("Your table", "میز شما")}</h2><p class="small lead">${L("The number is on the little stand on your table. We'll bring your order there.", "شماره روی پایه‌ی کوچک روی میز است. سفارش را همان‌جا می‌آوریم.")}</p>
+      sheet(`<h2>${L("Your table", "میزت")}</h2><p class="small lead">${L("The number is on the little stand on your table. We'll bring your order there.", "شماره رو پایه‌ی کوچیک روی میزه. سفارشت رو همون‌جا میاریم.")}</p>
         <label class="field"><span>${L("Table number", "شماره‌ی میز")}</span><input id="tn" inputmode="numeric" maxlength="3" value="${esc(cur?.table || "")}" placeholder="12" dir="ltr"></label>
-        <button class="btn btn--block" id="tsave" type="button" style="margin-top:18px">${L("Save", "ذخیره")}</button>`, { label: L("Your table", "میز شما"), onMount(b) {
+        <button class="btn btn--block" id="tsave" type="button" style="margin-top:18px">${L("Save", "ذخیره")}</button>`, { label: L("Your table", "میزت"), onMount(b) {
         const i = $("#tn", b); setTimeout(() => i.focus(), 350);
         const save = () => { const v = i.value.replace(/[۰-۹]/g, (d) => "۰۱۲۳۴۵۶۷۸۹".indexOf(d)).replace(/\D/g, ""); set((st) => ({ current: { ...st.current, table: v } })); closeSheet(); paint(); toast(v ? L(`Table ${v} — got it`, `میز ${digits(v)} — ثبت شد`) : L("Table cleared", "میز پاک شد"), "table"); };
         $("#tsave", b).addEventListener("click", save);
@@ -125,7 +125,7 @@ export default function checkin(el) {
       } });
     });
     $("#order-seat", el)?.addEventListener("click", () => set({ mode: "takeaway", branch: get().current.branch }));
-    $("#out", el)?.addEventListener("click", () => { set({ current: null }); haptic(8); paint(); toast(L("Checked out. See you soon", "خروج ثبت شد. به امید دیدار"), "door"); });
+    $("#out", el)?.addEventListener("click", () => { set({ current: null }); haptic(8); paint(); toast(L("Checked out. See you soon", "خروجت ثبت شد. می‌بینیمت"), "door"); });
   }
   paint();
 }

@@ -9,7 +9,7 @@ const row = (m) => {
   return `<div class="mi ${out ? "out" : ""}" role="button" tabindex="0" data-item="${m.id}">
     ${tile(m)}
     <div class="mi-main">
-      <div class="mi-t">${esc(loc(m))}${out ? `<span class="tag out">${L("Sold out", "تمام شد")}</span>` : m.isNew ? `<span class="tag new">${L("New", "جدید")}</span>` : m.sig ? `<span class="tag">${L("Signature", "امضای ما")}</span>` : ""}</div>
+      <div class="mi-t">${esc(loc(m))}${out ? `<span class="tag out">${L("Sold out", "تموم شد")}</span>` : m.isNew ? `<span class="tag new">${L("New", "جدید")}</span>` : m.sig ? `<span class="tag">${L("Signature", "امضای ما")}</span>` : ""}</div>
       <div class="mi-d">${esc(loc(m, "desc"))}</div>
       <div class="mi-p">${money(unitPrice(m, {}))}<button class="add" type="button" data-add="${m.id}" aria-label="${L("Add", "افزودن")} ${esc(loc(m))}" ${out ? "disabled" : ""}>${icon("plus")}</button></div>
     </div>
@@ -25,28 +25,26 @@ export default function menu(el, r) {
 
   el.innerHTML = `
   <div class="wrap page-top">
-    <div class="page-head"><div><h1 class="lt">${L("Menu", "منو")}</h1><p class="small">${L("Freshly made at each branch. Prices in Toman.", "در هر شعبه تازه آماده می‌شود. قیمت‌ها به تومان.")}</p></div></div>
+    <div class="page-head"><div><h1 class="lt">${L("Menu", "منو")}</h1><p class="small">${L("Freshly made at each branch. Prices in Toman.", "تو هر شعبه تازه درست می‌شه. قیمت‌ها به تومانه.")}</p></div></div>
     <div class="mode-card">
-      ${seg([["delivery", L("Delivery", "ارسال"), "scooter"], ["takeaway", L("Takeaway", "بیرون‌بر"), "takeaway"]], s.mode, "big")}
       <button class="row np" id="m-branch" type="button"></button>
     </div>
-    <div class="search" style="margin-top:14px"><span>${icon("search")}</span><input id="q" type="search" placeholder="${L("Search the menu", "جست‌وجو در منو")}" autocomplete="off" enterkeyhint="search" aria-label="${L("Search the menu", "جست‌وجو در منو")}"><button class="clear" type="button" id="qx" hidden aria-label="${L("Clear", "پاک کردن")}">${icon("close")}</button></div>
+    <div class="search" style="margin-top:14px"><span>${icon("search")}</span><input id="q" type="search" placeholder="${L("Search the menu", "تو منو بگرد")}" autocomplete="off" enterkeyhint="search" aria-label="${L("Search the menu", "تو منو بگرد")}"><button class="clear" type="button" id="qx" hidden aria-label="${L("Clear", "پاک کردن")}">${icon("close")}</button></div>
     <div class="chips-bar" id="chipsbar" style="margin-top:6px">
       <div class="chips" id="chips">${cats.map((c, i) => `<button class="chip" type="button" data-cat="${c.id}" aria-pressed="${i === 0}">${c.id === "fav" ? icon("heartF") : c.id === "pop" ? icon("flame") : ""}${esc(loc(c))}</button>`).join("")}</div>
     </div>
     <div id="list"></div>
     <div id="results" hidden></div>
-    <p class="tiny menu-note">${L("Preview menu — names and prices are placeholders until Conpanna sends the real one.", "منوی نمونه؛ نام‌ها و قیمت‌ها تا رسیدن منوی اصلی کن‌پانا موقت هستند.")}</p>
+    <p class="tiny menu-note">${L("Preview menu — names and prices are placeholders until Conpanna sends the real one.", "منو نمونه‌ست؛ اسم‌ها و قیمت‌ها تا وقتی منوی اصلی کن‌پانا برسه موقتی‌ان.")}</p>
     ${footer()}
   </div>`;
 
   const paintList = () => { $("#list", el).innerHTML = cats.map((c) => `<section class="cat" id="cat-${c.id}" data-cat="${c.id}"><h2>${esc(loc(c))}</h2><div class="items">${itemsOf(c).map(row).join("")}</div></section>`).join(""); };
   const paintBranch = () => {
     const nb = branch(get().branch), paused = isPaused(nb.id);
-    $("#m-branch", el).innerHTML = `<span class="row-main"><span class="row-s">${get().mode === "delivery" ? L("Delivering from", "ارسال از") : L("Pick up at", "تحویل در")}</span><span class="row-t" style="font-weight:600">${esc(loc(nb))}${L(", ", "، ")}${esc(loc(nb, "city"))} <span class="tiny">– ${paused ? L("orders paused", "سفارش متوقف") : openState(nb).label}</span></span></span><span class="row-v">${L("Change", "تغییر")}${icon("chev", "chev")}</span>`;
+    $("#m-branch", el).innerHTML = `<span class="row-main"><span class="row-s">${L("Takeaway from", "بیرون‌بر از")}</span><span class="row-t" style="font-weight:600">${esc(loc(nb))}${L(", ", "، ")}${esc(loc(nb, "city"))} <span class="tiny">– ${paused ? L("orders paused", "سفارش بسته‌ست") : openState(nb).label}</span></span></span><span class="row-v">${L("Change", "تغییر")}${icon("chev", "chev")}</span>`;
   };
   paintList(); paintBranch();
-  segmented($(".seg", el), (v) => { set({ mode: v }); paintBranch(); });
   $("#m-branch", el).addEventListener("click", () => branchSheet({ onPick: paintBranch }));
 
   el.addEventListener("click", (e) => {
@@ -87,7 +85,7 @@ export default function menu(el, r) {
     $("#chipsbar", el).style.display = t ? "none" : "";
     if (!t) return;
     const hits = MENU.filter((m) => [m.name, m.name_fa, m.desc, m.desc_fa].join(" ").toLowerCase().includes(t));
-    res.innerHTML = hits.length ? `<section class="cat"><h2>${L(`${hits.length} results`, `${num(hits.length)} نتیجه`)}</h2><div class="items">${hits.map(row).join("")}</div></section>` : `<div class="empty">${icon("search")}<h3>${L(`Nothing called “${esc(q.value)}”`, `چیزی با نام «${esc(q.value)}» نداریم`)}</h3><p class="small">${L("Try “latte”, “cake” or “iced”.", "«لاته»، «کیک» یا «آیس» را امتحان کنید.")}</p></div>`;
+    res.innerHTML = hits.length ? `<section class="cat"><h2>${L(`${hits.length} results`, `${num(hits.length)} نتیجه`)}</h2><div class="items">${hits.map(row).join("")}</div></section>` : `<div class="empty">${icon("search")}<h3>${L(`Nothing called “${esc(q.value)}”`, `چیزی به اسم «${esc(q.value)}» نداریم`)}</h3><p class="small">${L("Try “latte”, “cake” or “iced”.", "«لاته»، «کیک» یا «آیس» رو امتحان کن.")}</p></div>`;
   });
   $("#qx", el).addEventListener("click", () => { q.value = ""; q.dispatchEvent(new Event("input")); q.focus(); });
 

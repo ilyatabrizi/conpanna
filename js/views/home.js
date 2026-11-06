@@ -18,12 +18,12 @@ export function clubCard(s, { link = true } = {}) {
     <div class="wave">${WAVES}</div>
     <div class="club-top">
       <div><p class="club-k">${L("Conpanna Club", "باشگاه کن‌پانا")} – <b>${esc(loc(t))}</b></p>
-      <h3>${s.rewards ? L(`${s.rewards} free ${s.rewards === 1 ? "drink" : "drinks"} waiting`, `${num(s.rewards)} نوشیدنی رایگان منتظر شماست`) : L(`${goal - s.stamps} more to a free drink`, `${num(goal - s.stamps)} مهر تا نوشیدنی رایگان`)}</h3></div>
+      <h3>${s.rewards ? L(`${s.rewards} free ${s.rewards === 1 ? "drink" : "drinks"} waiting`, `${num(s.rewards)} نوشیدنی رایگان منتظرته`) : L(`${goal - s.stamps} more to a free drink`, `${num(goal - s.stamps)} مهر تا نوشیدنی رایگان`)}</h3></div>
       <span class="club-pts"><b>${num(s.points)}</b><small>${L("points", "امتیاز")}</small></span>
     </div>
     <div class="cups" style="--n:${goal}">${Array.from({ length: goal }, (_, i) => `<i class="${i < s.stamps ? "on" : ""}">${i < s.stamps ? CUP_SVG : ""}</i>`).join("")}</div>
     <div class="tier-bar"><span style="--p:${prog}"></span></div>
-    <div class="club-foot"><span>${nx ? L(`${num(nx.min - s.points)} points to ${nx.name}`, `${num(nx.min - s.points)} امتیاز تا ${nx.name_fa}`) : L("Top tier — thank you", "بالاترین سطح؛ ممنونیم")}</span>${link ? `<span class="club-go">${L("Rewards", "جوایز")}${icon("chev", "chev")}</span>` : ""}</div>
+    <div class="club-foot"><span>${nx ? L(`${num(nx.min - s.points)} points to ${nx.name}`, `${num(nx.min - s.points)} امتیاز تا ${nx.name_fa}`) : L("Top tier — thank you", "بالاترین سطحی؛ مرسی که هستی")}</span>${link ? `<span class="club-go">${L("Rewards", "جوایز")}${icon("chev", "chev")}</span>` : ""}</div>
   </${link ? "a" : "div"}>`;
 }
 
@@ -44,20 +44,19 @@ export default function home(el) {
       <div class="cup-wrap">
         <div class="saucer"></div>
         <div class="cup-handle"></div>
-        <div class="cup"><canvas class="latte" aria-label="${L("A cup of coffee — drag to stir it", "یک فنجان قهوه؛ برای هم زدن بکشید")}" role="img"></canvas><span class="cup-gloss"></span></div>
-        <span class="stir-hint" id="stir-hint">${icon("stir")}<span>${L("Stir it", "همش بزن")}</span></span>
+        <div class="cup"><canvas class="latte" aria-label="${L("A cup of coffee — drag to stir it", "یه فنجون قهوه؛ بکش تا هم بخوره")}" role="img"></canvas><span class="cup-gloss"></span></div>
       </div>
     </div>
     <div class="wrap hero-in">
       <div class="hero-copy">
         <p class="eyebrow">${greeting()}${name ? `, ${esc(name)}` : ""} – ${esc(loc(b, "city"))}</p>
         <h1><span class="tr" lang="tr" dir="ltr">Bu tat <em>senin.</em></span></h1>
-        <p class="sub">${L("This taste is yours. Order ahead for delivery or takeaway, check in for stamps, and see what's on this week.", "این طعم، مال توست. برای ارسال یا بیرون‌بر از قبل سفارش بدهید، با ورود به کافه مهر بگیرید و برنامه‌های این هفته را ببینید.")}</p>
+        <p class="sub">${L("This taste is yours. Order ahead for takeaway, check in for stamps, and see what's on this week.", "این طعم، مال توئه. از قبل سفارش بده و بیرون‌بر بگیر، وقتی اومدی کافه مهر جمع کن و ببین این هفته چه خبره.")}</p>
         <button class="hero-pill" id="h-branch" type="button"></button>
       </div>
       <div class="hero-cta">
-        <button class="btn btn--cream" data-mode="delivery" type="button">${icon("scooter")}${L("Delivery", "ارسال")}</button>
-        <button class="btn btn--glass" data-mode="takeaway" type="button">${icon("takeaway")}${L("Takeaway", "بیرون‌بر")}</button>
+        <a class="btn btn--cream" href="#/menu" data-go-menu>${icon("takeaway")}${L("Order takeaway", "سفارش بیرون‌بر")}</a>
+        <a class="btn btn--glass" href="#/checkin">${icon("checkin")}${L("I'm at the café", "کافه‌ام")}</a>
       </div>
     </div>
   </section>
@@ -109,15 +108,14 @@ export default function home(el) {
 
   // hero
   const stopLatte = mountLatte($(".latte", el));
-  el.addEventListener("stirred", () => { $("#stir-hint", el)?.classList.add("gone"); haptic(6); });
   const paintPill = () => {
     const nb = branch(get().branch), st = openState(nb), v = busy(nb), paused = isPaused(nb.id);
-    $("#h-branch", el).innerHTML = `<span class="dot ${st.isOpen && !paused ? "pulse" : "off"}"></span>${esc(loc(nb))} – ${paused ? L("Orders paused", "سفارش متوقف") : st.isOpen ? busyLabel(v) : st.label}${icon("chevD")}`;
+    $("#h-branch", el).innerHTML = `<span class="dot ${st.isOpen && !paused ? "pulse" : "off"}"></span>${esc(loc(nb))} – ${paused ? L("Orders paused", "سفارش بسته‌ست") : st.isOpen ? busyLabel(v) : st.label}${icon("chevD")}`;
   };
   paintPill();
   $("#h-branch", el).addEventListener("click", () => branchSheet({ onPick: paintPill }));
   $("#all-br", el).addEventListener("click", () => branchSheet({ title: L("Find a Conpanna", "پیدا کردن کن‌پانا"), pick: false }));
-  $$("[data-mode]", el).forEach((x) => x.addEventListener("click", () => { set({ mode: x.dataset.mode }); haptic(8); location.hash = "#/menu"; }));
+  $("[data-go-menu]", el).addEventListener("click", () => haptic(8));
 
   el.addEventListener("click", (e) => {
     const add = e.target.closest("[data-add]");
@@ -130,7 +128,7 @@ export default function home(el) {
   const paintRail = () => {
     $("#sigs", el).innerHTML = sigs.map((m) => { const out = isSoldOut(m.id); return `
       <div class="sig-card ${out ? "out" : ""}" role="button" tabindex="0" data-item="${m.id}">
-        ${m.isNew ? `<span class="badge-new">${L("New", "جدید")}</span>` : ""}${out ? `<span class="badge-out">${L("Sold out", "تمام شد")}</span>` : ""}
+        ${m.isNew ? `<span class="badge-new">${L("New", "جدید")}</span>` : ""}${out ? `<span class="badge-out">${L("Sold out", "تموم شد")}</span>` : ""}
         ${tile(m)}
         <h3>${esc(loc(m))}</h3>
         <div class="row2">${money(unitPrice(m, {}))}<button class="add" type="button" data-add="${m.id}" aria-label="${L("Add", "افزودن")} ${esc(loc(m))}" ${out ? "disabled" : ""}>${icon("plus")}</button></div>
@@ -139,25 +137,25 @@ export default function home(el) {
   const paint = () => {
     const st = get();
     // club + quick tiles
-    $("#club-sec", el).innerHTML = `<div class="sec"><h2>${L("Your club card", "کارت باشگاه شما")}</h2></div>${clubCard(st)}`;
+    $("#club-sec", el).innerHTML = `<div class="sec"><h2>${L("Your club card", "کارت باشگاهت")}</h2></div>${clubCard(st)}`;
     const vc = activeVouchers().length;
     $("#quick", el).innerHTML = `
       <a href="#/checkin"><span class="q-ic">${icon("checkin")}</span><span><b>${L("Check in", "ورود به کافه")}</b><span>${L("+1 stamp", "+۱ مهر")}</span></span></a>
       <a href="#/rewards"><span class="q-ic">${icon("gift")}${vc ? `<i class="q-badge">${num(vc)}</i>` : ""}</span><span><b>${L("Rewards", "جوایز")}</b><span>${vc ? L(`${vc} vouchers`, `${num(vc)} کوپن`) : L("Points & perks", "امتیاز و مزایا")}</span></span></a>
-      <a href="#/rewards?s=invite"><span class="q-ic">${icon("users")}</span><span><b>${L("Invite", "دعوت")}</b><span>${L("Both get a drink", "هر دو نوشیدنی")}</span></span></a>`;
+      <a href="#/rewards?s=invite"><span class="q-ic">${icon("users")}</span><span><b>${L("Invite", "دعوت")}</b><span>${L("Both get a drink", "هر دوتون یه نوشیدنی")}</span></span></a>`;
     // challenge
     const tried = (st.tried || []).length;
-    $("#challenge", el).innerHTML = `<span class="ch-ring" style="--p:${Math.min(1, tried / CHALLENGE.goal)}"><b>${num(Math.min(tried, CHALLENGE.goal))}/${num(CHALLENGE.goal)}</b></span><span class="row-main"><span class="eyebrow">${L("Challenge", "چالش")} – ${esc(loc(CHALLENGE, "title"))}</span><span class="row-t">${esc(loc(CHALLENGE, "sub"))}</span><span class="row-s">${st.challengeDone ? L("Done — a free cake is in your rewards", "انجام شد؛ یک کیک رایگان در جوایز شماست") : L("Reward: any cake, free", "جایزه: یک کیک رایگان")}</span></span>${icon("chev", "chev")}`;
+    $("#challenge", el).innerHTML = `<span class="ch-ring" style="--p:${Math.min(1, tried / CHALLENGE.goal)}"><b>${num(Math.min(tried, CHALLENGE.goal))}/${num(CHALLENGE.goal)}</b></span><span class="row-main"><span class="eyebrow">${L("Challenge", "چالش")} – ${esc(loc(CHALLENGE, "title"))}</span><span class="row-t">${esc(loc(CHALLENGE, "sub"))}</span><span class="row-s">${st.challengeDone ? L("Done — a free cake is in your rewards", "بردی! یه کیک رایگان تو جوایزته") : L("Reward: any cake, free", "جایزه: یه کیک رایگان")}</span></span>${icon("chev", "chev")}`;
     // live order
     const a = active()[0];
     $("#live", el).innerHTML = a ? (() => { const steps = STEPS[a.mode], i = stageOf(a); return `<a class="live-order" href="#/order/${a.id}">
         <span class="lo-code">#${digits(a.code)}</span>
-        <span class="row-main"><span class="eyebrow">${a.mode === "delivery" ? L("Delivery", "ارسال") : L("Takeaway", "بیرون‌بر")} – ${esc(loc(branch(a.branch)))}</span><span class="t3">${esc(stepTitle(steps[i]))}</span><span class="lo-steps">${steps.map((_, k) => `<i class="${k <= i ? "on" : ""}"></i>`).join("")}</span></span>${icon("chev", "chev")}</a>`; })() : "";
+        <span class="row-main"><span class="eyebrow">${L("Takeaway", "بیرون‌بر")} – ${esc(loc(branch(a.branch)))}</span><span class="t3">${esc(stepTitle(steps[i]))}</span><span class="lo-steps">${steps.map((_, k) => `<i class="${k <= i ? "on" : ""}"></i>`).join("")}</span></span>${icon("chev", "chev")}</a>`; })() : "";
     // your usual
     const u = usual();
     const ui = u && item(u.id);
-    $("#usual", el).innerHTML = ui ? `<div class="usual rv in">${tile(ui, "sm")}<span class="row-main"><span class="eyebrow">${L("Your usual", "همیشگیِ شما")}</span><span class="row-t">${esc(loc(ui))}</span><span class="row-s">${L(`Ordered ${u.times}×`, `${num(u.times)} بار سفارش داده‌اید`)}</span></span><button class="btn btn--sm" id="again" type="button">${icon("plus")}${L("Again", "دوباره")}</button></div>` : "";
-    $("#again", el)?.addEventListener("click", () => { if (isSoldOut(u.id)) { toast(L("Sold out today", "امروز تمام شد"), "info"); return; } addToBag(u.id, u.sel); haptic(10); toast(L("Your usual is in the bag", "همیشگی‌تان در سبد است"), "bag"); });
+    $("#usual", el).innerHTML = ui ? `<div class="usual rv in">${tile(ui, "sm")}<span class="row-main"><span class="eyebrow">${L("Your usual", "همیشگیِ تو")}</span><span class="row-t">${esc(loc(ui))}</span><span class="row-s">${L(`Ordered ${u.times}×`, `${num(u.times)} بار سفارشش دادی`)}</span></span><button class="btn btn--sm" id="again" type="button">${icon("plus")}${L("Again", "دوباره")}</button></div>` : "";
+    $("#again", el)?.addEventListener("click", () => { if (isSoldOut(u.id)) { toast(L("Sold out today", "امروز تموم شد"), "info"); return; } addToBag(u.id, u.sel); haptic(10); toast(L("Your usual is in the bag", "همیشگیت رفت تو سبد"), "bag"); });
   };
   paintRail();
   paint();

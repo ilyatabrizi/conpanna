@@ -1140,3 +1140,11 @@ html[dir="rtl"] { font-synthesis: none; }
 .hold:not(.pressing):not(.filled) .liq svg { opacity: 0; }
 .hold .liq svg { transition: opacity .25s; }
 html[dir="rtl"] .hold-in b { font-weight: 800; line-height: 1.4; }
+
+/* hero: keep the logo clear of the saucer, which reaches 11% past the cup */
+.hero-brand { position: relative; z-index: 4; }
+.hero-stage { --cup: min(64vw, 300px, 40svh); padding: calc(var(--cup) * .12 + 22px) 0 calc(var(--cup) * .12 + 6px); min-height: 0; }
+.hero-stage .cup-wrap { width: var(--cup); }
+@media (max-height: 720px) and (max-width: 899px) { .hero-stage { --cup: min(60vw, 260px, 36svh); } }
+@media (min-width: 900px) { .hero-stage { --cup: min(34vw, 400px); padding: 40px 0; } }
+.latte.no-gl { background: radial-gradient(circle at 48% 44%, #FBF4E8 0 16%, #E9D3B6 22%, #A86E44 34%, #6E3F22 60%, #3A1E10 100%); }

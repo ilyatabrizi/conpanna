@@ -8,31 +8,24 @@ import { L, loc, num, digits } from "./i18n.js";
 import { CHALLENGE } from "./data.js";
 
 export const STEPS = {
-  delivery: [
-    { k: "received", t: "Order received", t_fa: "سفارش دریافت شد", at: 0 },
-    { k: "brewing", t: "Brewing", t_fa: "در حال آماده‌سازی", at: 9 },
-    { k: "out", t: "On the way", t_fa: "در راه", at: 32 },
-    { k: "done", t: "Delivered", t_fa: "تحویل شد", at: 75 },
-  ],
   takeaway: [
-    { k: "received", t: "Order received", t_fa: "سفارش دریافت شد", at: 0 },
-    { k: "brewing", t: "Brewing", t_fa: "در حال آماده‌سازی", at: 9 },
-    { k: "ready", t: "Ready to collect", t_fa: "آماده‌ی تحویل", at: 34 },
-    { k: "done", t: "Collected", t_fa: "تحویل گرفته شد", at: 240 },
+    { k: "received", t: "Order received", t_fa: "سفارشت رسید", at: 0 },
+    { k: "brewing", t: "Brewing", t_fa: "داره آماده می‌شه", at: 9 },
+    { k: "ready", t: "Ready to collect", t_fa: "آماده‌ست", at: 34 },
+    { k: "done", t: "Collected", t_fa: "تحویلش گرفتی", at: 240 },
   ],
 };
+STEPS.delivery = STEPS.takeaway; STEPS.dinein = STEPS.takeaway;
 export const stepSub = (o, k) => ({
-  received: L(`Conpanna ${branch(o.branch).name} has your order`, `کن‌پانا ${branch(o.branch).name_fa} سفارشتان را گرفت`),
-  brewing: L("Your barista is on it", "باریستا مشغول است"),
-  out: L("Your courier picked it up", "پیک سفارش را برداشت"),
-  ready: L(`Show code ${o.code} at the counter`, `کد ${digits(o.code)} را به صندوق نشان دهید`),
+  received: L(`Conpanna ${branch(o.branch).name} has your order`, `کن‌پانا ${branch(o.branch).name_fa} سفارشت رو گرفت`),
+  brewing: L("Your barista is on it", "باریستا داره درستش می‌کنه"),
+  ready: L(`Show code ${o.code} at the counter`, `کد ${digits(o.code)} رو به صندوق نشون بده`),
   done: L("Enjoy. Bu tat senin.", "نوش جان. \u2068Bu tat senin.\u2069"),
 }[k]);
 const MSG = {
-  brewing: (o) => [L("Brewing your order", "سفارشتان در حال آماده‌سازی است"), L(`#${o.code} — your barista at ${branch(o.branch).name} is on it.`, `#${digits(o.code)} — باریستای ${branch(o.branch).name_fa} مشغول است.`)],
-  out: (o) => [L("On the way", "سفارش در راه است"), L(`#${o.code} left ${branch(o.branch).name}.`, `#${digits(o.code)} از ${branch(o.branch).name_fa} راه افتاد.`)],
-  ready: (o) => [L("Ready to collect ☕", "سفارش آماده است ☕"), L(`#${o.code} is waiting at ${branch(o.branch).name}. Show code ${o.code}.`, `#${digits(o.code)} در ${branch(o.branch).name_fa} منتظر شماست. کد ${digits(o.code)} را نشان دهید.`)],
-  done: (o) => [o.mode === "delivery" ? L("Delivered", "تحویل شد") : L("Enjoy your coffee", "نوش جان"), L("How was it? Tap to rate your order.", "چطور بود؟ برای امتیاز دادن بزنید.")],
+  brewing: (o) => [L("Brewing your order", "سفارشت داره آماده می‌شه"), L(`#${o.code} — your barista at ${branch(o.branch).name} is on it.`, `#${digits(o.code)} — باریستای ${branch(o.branch).name_fa} داره درستش می‌کنه.`)],
+  ready: (o) => [L("Ready to collect ☕", "سفارشت آماده‌ست ☕"), L(`#${o.code} is waiting at ${branch(o.branch).name}. Show code ${o.code}.`, `#${digits(o.code)} تو ${branch(o.branch).name_fa} منتظرته. کد ${digits(o.code)} رو نشون بده.`)],
+  done: (o) => [L("Enjoy your coffee", "نوش جان"), L("How was it? Tap to rate your order.", "چطور بود؟ بزن و امتیاز بده.")],
 };
 
 export function stageOf(o, now = Date.now()) {
@@ -55,11 +48,10 @@ export function placeOrder() {
     const it = item(l.id);
     return { id: l.id, sel: l.sel, name: it.name, name_fa: it.name_fa, qty: l.qty, opts: selLabel(it, l.sel), unit: unitPrice(it, l.sel) };
   });
-  const addr = s.mode === "delivery" ? s.addresses.find((a) => a.id === s.addrId) : null;
   const here = s.current && Date.now() - s.current.at < 4 * 3600e3 ? s.current : null;
   const o = {
-    id: uid("O"), code, at: Date.now(), mode: s.mode, branch: s.branch, pickup: s.mode === "takeaway" ? s.pickup : null,
-    table: here && here.branch === s.branch ? here.table : "", addr: addr ? `${addr.label} — ${addr.line}` : null, pay: s.pay, note: s.note || "",
+    id: uid("O"), code, at: Date.now(), mode: "takeaway", branch: s.branch, pickup: s.pickup,
+    table: here && here.branch === s.branch ? here.table : "", pay: s.pay, note: s.note || "",
     lines, count: lines.reduce((n, l) => n + l.qty, 0), customer: s.user ? { name: s.user.name, phone: s.user.phone } : null,
     subtotal: t.subtotal, reward: t.reward, voucher: t.voucher, discount: t.discount, tierOff: t.tierOff, fee: t.fee, total: t.total, promo: s.promo, rating: 0,
   };
@@ -74,7 +66,7 @@ export function placeOrder() {
   const tierUp = addPoints(t.points);
   let challenge = false;
   if (!get().challengeDone && tried.length >= CHALLENGE.goal) { set({ challengeDone: true }); challenge = true; }
-  notify({ title: L(`Order #${code} received`, `سفارش #${digits(code)} ثبت شد`), body: L(`${o.count} items – ${o.mode === "delivery" ? "Delivery" : "Takeaway"} from ${branch(o.branch).name}.`, `${num(o.count)} قلم – ${o.mode === "delivery" ? "ارسال" : "بیرون‌بر"} از ${branch(o.branch).name_fa}.`), cat: "order", url: `#/order/${o.id}`, tag: o.id });
+  notify({ title: L(`Order #${code} received`, `سفارش #${digits(code)} ثبت شد`), body: L(`${o.count} items – takeaway from ${branch(o.branch).name}.`, `${num(o.count)} قلم – بیرون‌بر از ${branch(o.branch).name_fa}.`), cat: "order", url: `#/order/${o.id}`, tag: o.id });
   ping({ type: "order", id: o.id });
   return { order: o, fresh, tierUp, challenge };
 }

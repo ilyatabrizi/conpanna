@@ -1,5 +1,5 @@
 // Everything the customer does stays on the phone: one object, saved on change.
-import { MENU, OPTION_SETS, PROMOS, DELIVERY, BRANCHES, TIERS, POINTS, VOUCHERS } from "./data.js";
+import { MENU, OPTION_SETS, PROMOS, BRANCHES, TIERS, POINTS, VOUCHERS } from "./data.js";
 import { priceOf, stampsGoal } from "./hub.js";
 import { loc } from "./i18n.js";
 
@@ -25,7 +25,7 @@ const load = () => {
     const raw = localStorage.getItem(KEY);
     if (!raw) return;
     const saved = JSON.parse(raw), d = DEFAULTS();
-    state = { ...d, ...saved, notif: { ...d.notif, ...(saved.notif || {}) }, prefs: { ...d.prefs, ...(saved.prefs || {}) } };
+    state = { ...d, ...saved, mode: "takeaway", notif: { ...d.notif, ...(saved.notif || {}) }, prefs: { ...d.prefs, ...(saved.prefs || {}) } };
   } catch (e) {}
 };
 load();
@@ -142,7 +142,7 @@ export function totals(s = state) {
   const gold = s.user && tierOf(s.points).id === "gold";
   const tierOff = gold ? Math.round(((base - discount) * 0.1) / 1000) * 1000 : 0;
   const after = Math.max(0, base - discount - tierOff);
-  const fee = s.mode === "delivery" && subtotal > 0 && !gold ? (after >= DELIVERY.freeOver ? 0 : DELIVERY.fee) : 0;
+  const fee = 0; // takeaway only
   const total = after + fee;
   const drinks = lines.reduce((n, x) => n + (isDrink(x.it) ? x.l.qty : 0), 0);
   return { subtotal, reward, voucher, voucherObj: v || null, discount, tierOff, fee, total, drinks, points: Math.round(total * POINTS.perToman) };

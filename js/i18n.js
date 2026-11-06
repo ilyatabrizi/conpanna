@@ -31,9 +31,11 @@ export const digits = (s) => (lang === "fa" ? String(s).replace(/\d/g, (d) => "�
 export const pct = (n) => (lang === "fa" ? `٪${num(n)}` : `${num(n)}%`);
 export const money = (n) => (n === 0 ? `<span class="money">${L("Free", "رایگان")}</span>` : `<span class="money">${num(n)}<small class="cur">${L("T", "تومان")}</small></span>`);
 export const moneyText = (n) => `${num(n)} ${L("Toman", "تومان")}`;
+const dec = (x, d) => { const s = x.toFixed(d).replace(/\.0$/, ""); return lang === "fa" ? digits(s).replace(".", "٫") : s; };
 export const kmoney = (n) => {
-  if (n >= 1e9) return `${digits((n / 1e9).toFixed(1))}${L("B", " میلیارد")}`;
-  if (n >= 1e6) return `${digits((n / 1e6).toFixed(n >= 1e8 ? 0 : 1))}${L("M", " میلیون")}`;
+  if (n < 0) return "−" + kmoney(-n);
+  if (n >= 1e9) return `${dec(n / 1e9, n >= 1e11 ? 0 : 1)}${L("B", " میلیارد")}`;
+  if (n >= 1e6) return `${dec(n / 1e6, n >= 1e8 ? 0 : 1)}${L("M", " میلیون")}`;
   return num(n);
 };
 
