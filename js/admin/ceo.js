@@ -17,6 +17,7 @@ const brs = () => BRANCHES.filter((b) => X.inScope(b.id));
 const item = (id) => MENU.find((m) => m.id === id);
 const bname = (id) => loc(BRANCHES.find((b) => b.id === id) || {});
 const dlabel = (d) => fmtDayNum(new Date(X.S.today0 - d * DAY));
+const dtip = (d) => fmtDay(new Date(X.S.today0 - d * DAY));
 const WD = ["یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه", "شنبه"];
 const WEEK = [6, 0, 1, 2, 3, 4, 5]; // Saturday first
 const range = (all, days, off = 0) => all.filter((o) => o.day >= off && o.day < off + days);
@@ -36,7 +37,7 @@ export function targets() {
 /* ----------------------------------------------------------------- alerts */
 export function alerts() {
   const out = [], now = Date.now();
-  const lowS = X.stock().map((s) => ({ s, left: s.qty / s.daily, it: STOCK.find((x) => x.id === s.item) })).filter((x) => x.left < 2.5).sort((a, b) => a.left - b.left);
+  const lowS = X.stock().map((s) => ({ s, left: s.qty / s.daily, it: STOCK.find((x) => x.id === s.item) })).filter((x) => x.left < X.cfg().low).sort((a, b) => a.left - b.left);
   lowS.filter((x) => x.left < 1).forEach(({ s, it }) => out.push({ r: "stock", k: "bad", ic: "layers", t: `${it.n} – ${bname(s.branch)}`, s: "کمتر از یه روز دیگه تموم می‌شه", act: ["سفارش بده", "inventory"] }));
   const soon = lowS.filter((x) => x.left >= 1);
   if (soon.length) out.push({ r: "stock", k: "warn", ic: "layers", t: `${num(soon.length)} قلم دیگه تا دو سه روز دیگه تموم می‌شن`, s: soon.slice(0, 4).map(({ s, it }) => `${it.n} (${bname(s.branch)})`).join("، ") + (soon.length > 4 ? "، …" : ""), act: ["لیست خرید", "inventory"] });
@@ -58,9 +59,13 @@ export function alerts() {
   const hub = getHub();
   brs().forEach((b) => { if (hub.paused[b.id] > now) out.push({ k: "info", ic: "pause", t: `سفارش آنلاین ${loc(b)} نگه داشته شده`, s: `تا ساعت ${fmtTime(new Date(hub.paused[b.id]))}`, act: ["شعبه‌ها", "branches"] }); });
   if (h >= 10) brs().forEach((b) => { const cl = X.checklist(b.id), n = cl.filter((c) => !c.done).length; if (n) out.push({ k: "warn", ic: "check", t: `چک‌لیست صبح ${loc(b)} کامل نشده`, s: `${num(n)} مورد مونده`, act: ["چک‌لیست", "tasks"] }); });
-  brs().forEach((b) => { const p = avg(done(all.filter((o) => o.branch === b.id && o.day < 7)), (o) => o.prep); if (p > 480) out.push({ r: "late", k: "info", ic: "clock", t: `آماده‌سازی تو ${loc(b)} کُنده`, s: `میانگین ${mins(p)} تو هفته‌ی اخیر`, act: ["کیفیت سرویس", "service"] }); });
+  brs().forEach((b) => { const p = avg(done(all.filter((o) => o.branch === b.id && o.day < 7)), (o) => o.prep); if (p > X.cfg().sla * 60) out.push({ r: "late", k: "info", ic: "clock", t: `آماده‌سازی تو ${loc(b)} کُنده`, s: `میانگین ${mins(p)} تو هفته‌ی اخیر`, act: ["کیفیت سرویس", "service"] }); });
   const lateP = X.S.staff.filter((p) => X.inScope(p.branch) && p.late30 >= 4);
   if (lateP.length) out.push({ r: "staff", k: "info", ic: "users", t: `${num(lateP.length)} نفر این ماه ۴ بار یا بیشتر دیر اومدن`, s: lateP.slice(0, 4).map((p) => `${p.name_fa} (${bname(p.branch)})`).join("، ") + (lateP.length > 4 ? "، …" : ""), act: ["پرسنل", "staff"] });
+  const tk = new Date().toDateString();
+  (A().closes || []).filter((c) => c.day === tk && X.inScope(c.branch) && Math.abs(c.diff) >= X.cfg().tol).forEach((c) => out.push({ r: "cash", k: "warn", ic: "cash", t: `اختلاف صندوق ${bname(c.branch)}`, s: `${c.diff < 0 ? "کسری" : "اضافه"} ${kmoney(Math.abs(c.diff))} تومان موقع بستن صندوق`, act: ["صندوق", "cash"] }));
+  const fl = A().cflags || {}, eod = new Date().setHours(23, 59, 59, 999), fu = Object.values(fl).filter((f) => f.follow && f.follow <= eod).length;
+  if (fu) out.push({ r: "crm", k: "info", ic: "users", t: `${num(fu)} مشتری امروز پیگیری می‌خوان`, s: "یادآوری‌هایی که خودت گذاشتی", act: ["مشتری‌ها", "customers"] });
   const ord = { bad: 0, warn: 1, info: 2 };
   const R = A().alertRules || {}, DEFR = { staff: false };
   return out.filter((a) => !a.r || (R[a.r] ?? DEFR[a.r] ?? true)).filter((a) => !(A().dismissed || []).includes(a.t)).sort((a, b) => ord[a.k] - ord[b.k]);
@@ -104,7 +109,7 @@ function overview() {
       ${card("همین الان", `<div class="feed">${live.slice(-5).reverse().map((o) => `<div class="feed-i"><span class="st st-${o.status}"></span><b>#${digits(o.code)}</b><span>${esc(o.name)} – ${esc(bname(o.branch))}</span><span class="tiny">${ago(o.at)}</span></div>`).join("") || empty("الان سفارشی تو جریان نیست.")}</div>`, { extra: `<button class="btn btn--sm btn--soft" data-go="orders">بورد سفارش‌ها</button>` })}
     </div>
     <div class="cards g2">
-      ${card("فروش ۱۴ روز گذشته", lines([{ vals: d14, label: "۱۴ روز گذشته" }, { vals: p14, label: "۱۴ روز قبلش", cls: "dash" }], Array.from({ length: 14 }, (_, i) => dlabel(14 - i))), { cls: "wide", extra: `<span class="tiny">${kmoney(sum(d14, (x) => x))} تومان – ${delta(sum(d14, (x) => x), sum(p14, (x) => x))}</span>` })}
+      ${card("فروش ۱۴ روز گذشته", lines([{ vals: d14, label: "۱۴ روز گذشته" }, { vals: p14, label: "۱۴ روز قبلش", cls: "dash" }], Array.from({ length: 14 }, (_, i) => dlabel(14 - i)), { tips: Array.from({ length: 14 }, (_, i) => dtip(14 - i)) }), { cls: "wide", extra: `<span class="tiny">${kmoney(sum(d14, (x) => x))} تومان – ${delta(sum(d14, (x) => x), sum(p14, (x) => x))}</span>` })}
       ${card("سفارش تو ساعت‌های روز", hourBars(hrsT, hrsA), { extra: `<span class="tiny legend"><i class="lg-t"></i>امروز <i class="lg-a"></i>میانگین ۷ روز</span>` })}
       ${card("پرفروش‌های این هفته", barsH(top.map(([id, v]) => ({ l: esc(loc(item(id))), v }))))}
       ${card("شعبه‌ها امروز", barsH(brs().map((b) => { const v = sum(today.filter((o) => o.branch === b.id)); return { l: esc(loc(b)), v, f: kmoney(v) }; })), { extra: `<button class="link sm" data-go="branches">مقایسه</button>` })}
@@ -165,7 +170,7 @@ function sales() {
       ${kpi("لغو و مرجوعی", num(canc.length), `${T(sum(canc))} از دست رفت`, delta(canc.length, cancP.length, { inverse: true }))}
     </div>
     <div class="cards g2">
-      ${card(`فروش روزانه – ${num(P)} روز گذشته`, lines([{ vals, label: "این دوره" }, { vals: pvals, label: "دوره‌ی قبل", cls: "dash" }], Array.from({ length: P }, (_, i) => dlabel(P - i))), { cls: "wide" })}
+      ${card(`فروش روزانه – ${num(P)} روز گذشته`, lines([{ vals, label: "این دوره" }, { vals: pvals, label: "دوره‌ی قبل", cls: "dash" }], Array.from({ length: P }, (_, i) => dlabel(P - i)), { tips: Array.from({ length: P }, (_, i) => dtip(P - i)) }), { cls: "wide" })}
       ${card("کِی شلوغه؟ (سفارش در روز و ساعت)", heat(WEEK.map((w) => WD[w]), Array.from({ length: 16 }, (_, i) => digits(i + 8)), m), { cls: "wide" })}
       ${card("روش پرداخت", donutH([{ l: "کارت‌خوان", v: payN("card"), c: "#45281A" }, { l: "آنلاین (اپ)", v: payN("online"), c: "#C9A57C" }, { l: "نقد", v: payN("cash"), c: "#8A5634" }]))}
       ${card("کانال فروش", donutH([{ l: "اپ", v: c.filter((o) => o.channel === "app").length, c: "#C9A57C" }, { l: "صندوق – بیرون‌بر", v: c.filter((o) => o.channel !== "app" && o.mode === "takeaway").length, c: "#45281A" }, { l: "صندوق – سالن", v: c.filter((o) => o.mode === "dinein").length, c: "#8A5634" }]))}
@@ -179,7 +184,7 @@ function sales() {
 export function pnl(list, days, branchIds) {
   const c = done(list);
   const gross = sum(c, (o) => o.subtotal ?? o.total), disc = sum(c, (o) => o.discount || 0), net = gross - disc;
-  const vat = Math.round(net / 11), afterVat = net - vat;
+  const cf = X.cfg(), vat = Math.round((net * cf.vat) / (100 + cf.vat)), afterVat = net - vat;
   const cogs = sum(c, (o) => o.cost || 0);
   const f = days / 30;
   const staff = X.S.staff.filter((p) => branchIds.includes(p.branch));
@@ -188,7 +193,7 @@ export function pnl(list, days, branchIds) {
   const share = branchIds.length / BRANCHES.length;
   const mkt = X.S.shared.marketing * f * share, soft = (X.S.shared.software + X.S.shared.accounting) * f * share;
   const waste = sum(X.S.waste.filter((w) => branchIds.includes(w.branch)), (w) => w.qty * STOCK.find((s) => s.id === w.item).cost) * (days / 7);
-  const fees = Math.round(sum(c.filter((o) => o.pay !== "cash"), (o) => o.total) * 0.004);
+  const fees = Math.round(sum(c.filter((o) => o.pay !== "cash"), (o) => o.total) * (X.cfg().fee / 100));
   const extra = sum((A().expenses || []).filter((e) => branchIds.includes(e.branch) && Date.now() - e.at < days * DAY), (e) => e.amount);
   const opex = wages + rent + util + mkt + soft + waste + fees + extra;
   const gp = afterVat - cogs, np = gp - opex;
@@ -214,7 +219,7 @@ function finance() {
     <div class="cards g2">
       ${card(`صورت سود و زیان – ${num(P)} روز`, `<div class="pl">
         ${line("فروش ناخالص", r.gross, { pctOf: 0 })}${line("تخفیف‌ها", -r.disc, { sub: true, pctOf: 0 })}${line("فروش خالص", r.net, { k: "tot", pctOf: 0 })}
-        ${line("مالیات بر ارزش افزوده (٪۱۰)", -r.vat, { sub: true, pctOf: 0 })}${line("درآمد بعد از مالیات", r.afterVat, { k: "tot" })}
+        ${line(`مالیات بر ارزش افزوده (${pct(X.cfg().vat)})`, -r.vat, { sub: true, pctOf: 0 })}${line("درآمد بعد از مالیات", r.afterVat, { k: "tot" })}
         ${line("بهای مواد اولیه و بسته‌بندی", -r.cogs, { sub: true })}${line("سود ناخالص", r.gp, { k: "tot" })}
         ${line("حقوق و دستمزد", -r.wages, { sub: true })}${line("اجاره", -r.rent, { sub: true })}${line("آب و برق و گاز", -r.util, { sub: true })}${line("بازاریابی", -r.mkt, { sub: true })}${line("نرم‌افزار و حسابداری", -r.soft, { sub: true })}${line("ضایعات", -r.waste, { sub: true })}${line("کارمزد بانکی", -r.fees, { sub: true })}${r.extra ? line("هزینه‌های ثبت‌شده‌ی تو", -r.extra, { sub: true }) : ""}
         ${line("سود خالص", r.np, { k: "tot big " + (r.np >= 0 ? "pos" : "neg") })}</div>`)}

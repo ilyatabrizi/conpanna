@@ -39,7 +39,8 @@ export function spark(vals, { w = 90, h = 26 } = {}) {
 }
 
 // lines: [{ vals, label, cls }] — the first gets an area under it
-export function lines(series, labels, { h = 240, fmt = kmoney } = {}) {
+export function lines(series, labels, { h = 240, fmt = kmoney, tips = null } = {}) {
+  const unit = fmt === kmoney ? " تومان" : "";
   const w = 1000, pad = 30, all = series.flatMap((s) => s.vals), max = Math.max(...all, 1) * 1.12;
   const n = Math.max(...series.map((s) => s.vals.length));
   const x = (i) => { const v = pad + (i * (w - pad * 2)) / Math.max(1, n - 1); return rtl() ? w - v : v; }, y = (v) => h - 26 - (v / max) * (h - 46);
@@ -52,7 +53,8 @@ export function lines(series, labels, { h = 240, fmt = kmoney } = {}) {
     <path d="${path(s0.vals)}L${x(s0.vals.length - 1)} ${h - 26}L${x(0)} ${h - 26}Z" fill="url(#lg0)"/>
     ${series.slice(1).map((s) => `<path d="${path(s.vals)}" class="ln2 ${s.cls || ""}"/>`).join("")}
     <path d="${path(s0.vals)}" class="ln"/>
-    ${s0.vals.map((v, i) => `<g class="pt"><circle cx="${x(i)}" cy="${y(v)}" r="${i === s0.vals.length - 1 ? 5 : n > 40 ? 0 : 3}"/><title>${labels[i]}: ${fmt(v)}${series[1] ? ` — قبلی: ${fmt(series[1].vals[i] ?? 0)}` : ""}</title></g>`).join("")}
+    ${s0.vals.map((v, i) => `<g class="pt"><circle cx="${x(i)}" cy="${y(v)}" r="${i === s0.vals.length - 1 ? 5 : n > 40 ? 0 : 3}"/></g>`).join("")}
+    ${s0.vals.map((v, i) => { const bw = (w - pad * 2) / Math.max(1, n - 1); return `<rect class="hit" x="${(x(i) - bw / 2).toFixed(1)}" y="0" width="${bw.toFixed(1)}" height="${h - 26}" data-tip="${esc(tips ? tips[i] : labels[i])}\n${esc(series[0].label || "")}${series[0].label ? ": " : ""}${esc(fmt(v))}${unit}${series[1] ? `\n${esc(series[1].label || "قبلی")}: ${esc(fmt(series[1].vals[i] ?? 0))}${unit}` : ""}"/>`; }).join("")}
     ${labels.map((l, i) => ((n - 1 - i) % every === 0 ? `<text x="${x(i)}" y="${h - 6}" text-anchor="middle">${l}</text>` : "")).join("")}
   </svg>${series.length > 1 ? `<div class="legend-row">${series.map((s, i) => `<span class="legend"><i class="${i ? "lg-b " + (s.cls || "") : "lg-t"}"></i>${s.label}</span>`).join("")}</div>` : ""}`;
 }
@@ -60,7 +62,7 @@ export function lines(series, labels, { h = 240, fmt = kmoney } = {}) {
 // vertical bars, grouped: groups [{ l, v: [a, b, c] }], keys [{ l, c }]
 export function gbars(groups, keys, { fmt = kmoney, h = 200 } = {}) {
   const max = Math.max(...groups.flatMap((g) => g.v), 1);
-  return `<div class="gbars" style="--h:${h}px">${groups.map((g) => `<div class="gb"><div class="gb-bars">${g.v.map((v, i) => `<i style="--v:${(Math.max(0, v) / max).toFixed(3)};--c:${keys[i].c}" title="${esc(keys[i].l)}: ${fmt(v)}"></i>`).join("")}</div><small>${g.l}</small></div>`).join("")}</div>
+  return `<div class="gbars" style="--h:${h}px">${groups.map((g) => `<div class="gb"><div class="gb-bars">${g.v.map((v, i) => `<i style="--v:${(Math.max(0, v) / max).toFixed(3)};--c:${keys[i].c}" data-tip="${esc(g.l)} – ${esc(keys[i].l)}: ${esc(fmt(v))}"></i>`).join("")}</div><small>${g.l}</small></div>`).join("")}</div>
     <div class="legend-row">${keys.map((k) => `<span class="legend"><i style="background:${k.c}"></i>${k.l}</span>`).join("")}</div>`;
 }
 
@@ -68,7 +70,7 @@ export function gbars(groups, keys, { fmt = kmoney, h = 200 } = {}) {
 export function heat(rowL, colL, m) {
   const mx = Math.max(...m.flat(), 1);
   return `<div class="heat" style="--cols:${colL.length}"><span></span>${colL.map((c) => `<small class="hx-c">${c}</small>`).join("")}
-    ${rowL.map((r, i) => `<small class="hx-r">${r}</small>${m[i].map((v, j) => `<i style="--a:${(v / mx).toFixed(3)}" title="${r} – ${colL[j]}: ${num(v)}"></i>`).join("")}`).join("")}</div>`;
+    ${rowL.map((r, i) => `<small class="hx-r">${r}</small>${m[i].map((v, j) => `<i style="--a:${(v / mx).toFixed(3)}" data-tip="${r} – ${colL[j]}: ${num(v)}"></i>`).join("")}`).join("")}</div>`;
 }
 
 // scatter with median cross-hairs and four named corners; labels that would
@@ -94,8 +96,8 @@ export function quad(pts, { xl, yl, names }) {
     <line x1="${cx}" x2="${cx}" y1="${p - 10}" y2="${h - p + 6}" class="axis"/><line x1="${p - 30}" x2="${w - p + 30}" y1="${cy}" y2="${cy}" class="axis"/>
     <text x="${far}" y="26" text-anchor="end" class="qn">${names[0]}</text><text x="${near}" y="26" text-anchor="start" class="qn">${names[1]}</text>
     <text x="${far}" y="${h - 10}" text-anchor="end" class="qn">${names[2]}</text><text x="${near}" y="${h - 10}" text-anchor="start" class="qn">${names[3]}</text>
-    ${pts.map((q) => `<g class="qp"><circle cx="${X(q.x).toFixed(1)}" cy="${Y(q.y).toFixed(1)}" r="9" style="fill:${q.c}"/>${lab.has(q) ? `<text x="${X(q.x).toFixed(1)}" y="${lab.get(q).toFixed(1)}" text-anchor="middle">${esc(q.l)}</text>` : ""}<title>${esc(q.l)}</title></g>`).join("")}
-  </svg><div class="legend-row"><span class="tiny">${rtl() ? "←" : "→"} ${xl}</span><span class="tiny">↑ ${yl}</span><span class="tiny">اسم بعضی آیتم‌ها شلوغ می‌شد؛ نقطه رو نگه دار تا ببینی.</span></div>`;
+    ${pts.map((q) => `<g class="qp" data-tip="${esc(q.l)}"><circle cx="${X(q.x).toFixed(1)}" cy="${Y(q.y).toFixed(1)}" r="9" style="fill:${q.c}"/>${lab.has(q) ? `<text x="${X(q.x).toFixed(1)}" y="${lab.get(q).toFixed(1)}" text-anchor="middle">${esc(q.l)}</text>` : ""}</g>`).join("")}
+  </svg><div class="legend-row"><span class="tiny">${rtl() ? "←" : "→"} ${xl}</span><span class="tiny">↑ ${yl}</span><span class="tiny">اسم بعضی آیتم‌ها شلوغ می‌شد؛ موس رو روی نقطه ببر تا ببینی.</span></div>`;
 }
 
 export function ring(p, big, small = "", { c = "var(--caramel-ink)" } = {}) {

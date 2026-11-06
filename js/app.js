@@ -1,6 +1,6 @@
 // Wiring: language, theme, routes, the top bar's scroll-derived chrome, the
 // opening, the inbox, campaigns arriving from the panel, the service worker.
-import { $, $$, icon, closeSheet, sheet, esc, reveal, haptic, toast } from "./ui.js";
+import { $, $$, icon, closeSheet, sheet, esc, reveal, haptic, toast, netWatch } from "./ui.js";
 import { get, set, subscribe, flush } from "./store.js";
 import { LOCKUP } from "./brand.js";
 import { initTabbar, paintTabs, setTone, expand, paintLabels } from "./tabbar.js";
@@ -138,6 +138,7 @@ function boot() {
   render();
   tick();
   deliverBroadcasts();
+  netWatch();
   setInterval(() => { tick(); remindTick(); }, 1000);
   const warm = document.documentElement.classList.contains("boot-warm") || document.documentElement.classList.contains("calm");
   setTimeout(() => {

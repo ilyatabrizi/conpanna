@@ -98,7 +98,14 @@ export default function bag(el, r, { dock }) {
   function wire() {
     $("#b-branch", el).addEventListener("click", () => branchSheet({ onPick: paint, title: L("Pick up at", "از کجا تحویل می‌گیری") }));
     $$("#slots .slot", el).forEach((x) => x.addEventListener("click", () => { set({ pickup: x.dataset.v }); $$("#slots .slot", el).forEach((y) => y.setAttribute("aria-pressed", y === x ? "true" : "false")); haptic(5); }));
-    $$(".stepper button", el).forEach((x) => x.addEventListener("click", () => { const l = get().bag.find((y) => y.key === x.dataset.k); setQty(l.key, Math.min(20, l.qty + +x.dataset.d)); haptic(5); paint(); }));
+    $$(".stepper button", el).forEach((x) => x.addEventListener("click", () => {
+      const l = get().bag.find((y) => y.key === x.dataset.k), q = Math.min(20, l.qty + +x.dataset.d);
+      if (q > 0) { setQty(l.key, q); haptic(5); paint(); return; }
+      // taking the last one out: keep a way back
+      const before = { bag: get().bag.slice(), redeem: get().redeem, voucherId: get().voucherId };
+      setQty(l.key, 0); haptic(8); paint();
+      toast(L(`${item(l.id).name} removed`, `${esc(loc(item(l.id)))} از سبد رفت`), "trash", { action: L("Undo", "برگردون"), onAction: () => { set(before); paint(); } });
+    }));
     $$("[data-edit]", el).forEach((x) => {
       const open = () => { const l = get().bag.find((y) => y.key === x.dataset.edit); itemSheet(l.id, { line: l }); };
       x.addEventListener("click", open);

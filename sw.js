@@ -1,7 +1,7 @@
 // Offline: the shell and assets are cached on install; pages are network-first
 // with the cache as fallback, assets cache-first. Notification taps open the app
 // at the screen the notification is about.
-const CACHE = "conpanna-83800cf508";
+const CACHE = "conpanna-1b1cc8cedd";
 const ASSETS = [
 "./",
 "admin.html",
@@ -21,7 +21,9 @@ const ASSETS = [
 "css/app.css",
 "js/admin/admin.js",
 "js/admin/ceo.js",
+"js/admin/crm.js",
 "js/admin/kit.js",
+"js/admin/more.js",
 "js/admin/ops.js",
 "js/admin/seed.js",
 "js/app.js",

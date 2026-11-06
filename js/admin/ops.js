@@ -29,7 +29,7 @@ let invAll = false;
 function inventory() {
   const st = X.stock(), pos = (A().pos || []).filter((p) => X.inScope(p.branch));
   const open = pos.filter((p) => p.status === "sent");
-  const low = st.filter((s) => s.qty / s.daily < 2.5);
+  const low = st.filter((s) => s.qty / s.daily < X.cfg().low);
   const value = sum(st, (s) => s.qty * sItem(s.item).cost);
   const wasteAll = [...X.S.waste, ...(A().waste || [])].filter((w) => X.inScope(w.branch) && Date.now() - w.at < 7 * DAY);
   const wasteV = sum(wasteAll, (w) => w.qty * sItem(w.item).cost);
@@ -43,7 +43,7 @@ function inventory() {
       ${kpi("ضایعات این هفته", T(wasteV), `${num(wasteAll.length)} مورد`)}
     </div>
     ${card("موجودی انبار", table(["قلم", "شعبه", "موجودی", "مصرف روزانه", "چند روز دیگه", "", "پیشنهاد خرید", ""], rows.map((s) => {
-      const it = sItem(s.item), left = s.qty / s.daily, k = left < 1 ? "bad" : left < 2.5 ? "warn" : "ok";
+      const it = sItem(s.item), left = s.qty / s.daily, k = left < 1 ? "bad" : left < X.cfg().low ? "warn" : "ok";
       return [`<b>${esc(it.n)}</b>`, esc(bname(s.branch)), `${amount(s.qty, it.u)} ${it.u}`, `${amount(s.daily, it.u)} ${it.u}`, `<b class="${k === "ok" ? "" : k === "bad" ? "neg" : "warn-t"}">${fa1(left)} روز</b>`, meter(left / 7, k), sugg(s) > 0 ? `${amount(Math.ceil(sugg(s) * (it.u === "عدد" || it.u === "برش" ? 1 : 10)) / (it.u === "عدد" || it.u === "برش" ? 1 : 10), it.u)} ${it.u}` : "—", sugg(s) > 0 ? `<button class="btn btn--sm btn--soft" data-po="${s.branch}|${s.item}">${icon("send")}سفارش</button>` : ""];
     }), { cls: "stock" }) + (rows.length ? "" : empty("همه‌چی تا چند روز آینده هست 👌")), { extra: `<div class="chips-row tight"><button class="chip sm" data-inv="0" aria-pressed="${!invAll}">زیر ۴ روز (${num(all.filter((s) => s.qty / s.daily < 4).length)})</button><button class="chip sm" data-inv="1" aria-pressed="${invAll}">همه (${num(all.length)})</button><button class="btn btn--sm" id="po-all">${icon("bolt")}سفارش همه‌ی کم‌ها</button></div>` })}
     <div class="cards g2">
@@ -93,7 +93,7 @@ function staff() {
 /* ------------------------------------------------------------------ service */
 function service() {
   const P = per(), all = range(X.orders(), P), c = done(all);
-  const sla = 480, onTime = c.filter((o) => o.prep <= sla).length / (c.length || 1);
+  const sla = X.cfg().sla * 60, onTime = c.filter((o) => o.prep <= sla).length / (c.length || 1);
   const late = c.filter((o) => o.prep > 600);
   const canc = all.filter((o) => o.status !== "done");
   const p90 = (a) => { const s = a.map((o) => o.prep).sort((x, y) => x - y); return s[Math.floor(s.length * 0.9)] || 0; };
@@ -109,16 +109,16 @@ function service() {
   return `${periodBar(P)}
     <div class="kpis k6">
       ${kpi("میانگین آماده‌سازی", mins(avg(c, (o) => o.prep)), `٪۹۰ زیر ${mins(p90(c))}`)}
-      ${kpi("زیر ۸ دقیقه", pct(Math.round(onTime * 100)), "هدف: ٪۹۰")}
+      ${kpi(`زیر ${num(X.cfg().sla)} دقیقه`, pct(Math.round(onTime * 100)), "هدف: ٪۹۰")}
       ${kpi("سفارش‌های دیرشده", num(late.length), "بیشتر از ۱۰ دقیقه")}
       ${kpi("لغو و مرجوعی", pct(Math.round((canc.length / (all.length || 1)) * 1000) / 10), `${num(canc.length)} سفارش – ${kmoney(sum(canc))} تومان`)}
       ${kpi("رضایت", `${fa1(avg(rated, (o) => o.rating))}<small> از ۵</small>`, `${num(rated.length)} امتیاز`)}
       ${kpi("شاخص وفاداری", num(Math.round(((rated.filter((o) => o.rating === 5).length - rated.filter((o) => o.rating <= 3).length) / (rated.length || 1)) * 100)), "۵ ستاره‌ها منهای ۳ و کمتر")}
     </div>
     <div class="cards g2">
-      ${card("سرعت هر شعبه", table(["شعبه", "میانگین", "٪۹۰ زیر", "زیر ۸ دقیقه", "", "دیرشده", "لغو"], brs().map((b) => { const a = c.filter((o) => o.branch === b.id), x = all.filter((o) => o.branch === b.id && o.status !== "done"), ot = a.filter((o) => o.prep <= sla).length / (a.length || 1); return [`<b>${esc(loc(b))}</b>`, mins(avg(a, (o) => o.prep)), mins(p90(a)), pct(Math.round(ot * 100)), meter(ot, ot >= 0.9 ? "ok" : ot >= 0.8 ? "warn" : "bad"), num(a.filter((o) => o.prep > 600).length), num(x.length)]; })), { cls: "wide" })}
+      ${card("سرعت هر شعبه", table(["شعبه", "میانگین", "٪۹۰ زیر", `زیر ${num(X.cfg().sla)} دقیقه`, "", "دیرشده", "لغو"], brs().map((b) => { const a = c.filter((o) => o.branch === b.id), x = all.filter((o) => o.branch === b.id && o.status !== "done"), ot = a.filter((o) => o.prep <= sla).length / (a.length || 1); return [`<b>${esc(loc(b))}</b>`, mins(avg(a, (o) => o.prep)), mins(p90(a)), pct(Math.round(ot * 100)), meter(ot, ot >= 0.9 ? "ok" : ot >= 0.8 ? "warn" : "bad"), num(a.filter((o) => o.prep > 600).length), num(x.length)]; })), { cls: "wide" })}
       ${card("آماده‌سازی تو ساعت‌های روز (دقیقه)", gbars(byHour, [{ l: "میانگین دقیقه", c: "#C9A57C" }], { fmt: (v) => fa1(v), h: 170 }))}
-      ${card("ورود به کافه و سفارش‌ها – ۱۴ روز", lines([{ vals: ord, label: "سفارش" }, { vals: ci, label: "ورود به کافه (وای‌فای و اپ)", cls: "dash" }], d14.map((d) => fmtDayNum(new Date(X.S.today0 - d * DAY))), { fmt: num, h: 200 }))}
+      ${card("ورود به کافه و سفارش‌ها – ۱۴ روز", lines([{ vals: ord, label: "سفارش" }, { vals: ci, label: "ورود به کافه (وای‌فای و اپ)", cls: "dash" }], d14.map((d) => fmtDayNum(new Date(X.S.today0 - d * DAY))), { fmt: num, h: 200, tips: d14.map((d) => fmtDay(new Date(X.S.today0 - d * DAY))) }))}
       ${card("پر بودن سالن (تخمینی)", heat(brs().map((b) => esc(loc(b))), Array.from({ length: 16 }, (_, i) => digits(i + 8)), occ.map((r) => r.map((v) => Math.round(v * 100)))) + `<p class="tiny" style="margin-top:8px">از روی سفارش‌های سالن و تعداد صندلی هر شعبه.</p>`, { cls: "wide" })}
       ${card("مشتری‌ها درباره‌ی چی حرف می‌زنن", `<div class="topics">${topics.map((t) => `<div class="topic"><b>${TOPICS[t.k]}</b><span class="tiny">${num(t.n)} نظر</span>${meter(t.r / 5, t.r >= 4 ? "ok" : t.r >= 3 ? "warn" : "bad")}<span class="${t.r >= 4 ? "pos" : t.r >= 3 ? "" : "neg"}">${fa1(t.r)} ★</span></div>`).join("")}</div><button class="link sm" data-go="reviews" style="margin-top:10px">همه‌ی نظرها</button>`)}
       ${card("آخرین سفارش‌های دیرشده", table(["سفارش", "شعبه", "کِی", "طول کشید", "اقلام", "باریستا"], [...late].sort((a, b) => b.at - a.at).slice(0, 7).map((o) => [`<b>#${digits(o.code)}</b>`, esc(bname(o.branch)), `<span class="tiny">${ago(o.at)}</span>`, `<b class="neg">${mins(o.prep)}</b>`, num(o.qty), esc(X.S.staff.find((p) => p.id === o.staff)?.name_fa || "—")])))}
@@ -233,7 +233,7 @@ export function wireOps(el) {
   }));
   $("#po-all", el)?.addEventListener("click", () => {
     const open = new Set((A().pos || []).filter((p) => p.status === "sent").map((p) => p.branch + "|" + p.item));
-    const list = X.stock().filter((s) => s.qty / s.daily < 2.5 && !open.has(s.branch + "|" + s.item)).map((s) => makePO(s.branch, s.item)).filter(Boolean);
+    const list = X.stock().filter((s) => s.qty / s.daily < X.cfg().low && !open.has(s.branch + "|" + s.item)).map((s) => makePO(s.branch, s.item)).filter(Boolean);
     if (!list.length) { toast("چیزی برای سفارش نمونده", "info"); return; }
     X.setA({ pos: [...(A().pos || []), ...list] }); X.log(`${num(list.length)} قلم کم رو یه‌جا سفارش داد`);
     toast(`${num(list.length)} سفارش خرید رفت`, "send"); X.render();

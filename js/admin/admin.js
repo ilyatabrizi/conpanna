@@ -3,7 +3,7 @@
 // place (branches, store room, staff, service, checklists), plus reports and
 // access. It talks to the customer app through hub.js: on one device, an order
 // placed in the app lands on the board instantly.
-import { $, $$, esc, icon, money, sheet, closeSheet, toast, haptic, sw, segmented, loc, num, digits, kmoney, ago, fmtTime, fmtDay, relDay, pct, dayFromToday, tile, hhmm } from "../ui.js";
+import { $, $$, esc, icon, money, sheet, closeSheet, toast, haptic, sw, segmented, loc, num, digits, kmoney, ago, fmtTime, fmtDay, relDay, pct, dayFromToday, tile, hhmm, netWatch } from "../ui.js";
 import { applyLang } from "../i18n.js";
 import { applyTheme } from "../theme.js";
 import { getHub, setHub, onHub } from "../hub.js";
@@ -14,13 +14,18 @@ import { stageOf } from "../orders.js";
 import { seed, costOf } from "./seed.js";
 import { initCeo, CEO, wireCeo, alerts, barsH } from "./ceo.js";
 import { initOps, OPS, wireOps, csvExport } from "./ops.js";
+import { initCrm, CRM, wireCrm, openCustomer, crmTitle } from "./crm.js";
+import { initMore, MORE, wireMore, annCard, compareCard, openPalette, helpSheet, cfg } from "./more.js";
 
 const KEY = "conpanna.admin.v1";
 const DEF = () => ({ authed: false, live: false, status: {}, sims: [], notes: {}, campaigns: [], section: "overview", scope: "all",
-  period: 30, targets: {}, expenses: [], pos: [], received: {}, waste: [], alertRules: {}, alertCh: null, dismissed: [], shifts: {}, checks: {}, maintDone: {}, todos: [], perms: null, reports: {}, log: [], sim: null });
+  period: 30, targets: {}, expenses: [], pos: [], received: {}, waste: [], alertRules: {}, alertCh: null, dismissed: [], shifts: {}, checks: {}, maintDone: {}, todos: [], perms: null, reports: {}, log: [], sim: null,
+  cid: null, cnotes: {}, ctags: {}, cflags: {}, clog: {}, cmsg: {}, recentC: [], cfg: {}, closes: [], petty: [], ann: [], cmp: null, compact: false, collapsed: false });
 let A = DEF();
 try { A = { ...DEF(), ...JSON.parse(localStorage.getItem(KEY) || "{}") }; } catch (e) {}
 if (![7, 30, 60].includes(A.period)) A.period = 30;
+// notes used to be one line per customer; now they're a list
+if (A.notes && Object.keys(A.notes).length) { Object.entries(A.notes).forEach(([id, t]) => { if (t && t.trim()) A.cnotes = { ...A.cnotes, [id]: [...(A.cnotes[id] || []), { at: Date.now(), t }] }; }); A.notes = {}; }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(A)); } catch (e) {} };
 const setA = (p) => { A = { ...A, ...p }; save(); };
 
@@ -97,6 +102,7 @@ function segments() {
 /* ----------------------------------------------------------------- sound */
 let actx = null;
 function ding() {
+  if (!cfg().sound) return;
   try {
     actx ||= new (window.AudioContext || window.webkitAudioContext)();
     [880, 1320].forEach((f, i) => { const o = actx.createOscillator(), g = actx.createGain(); o.type = "sine"; o.frequency.value = f; g.gain.setValueAtTime(0.0001, actx.currentTime + i * 0.14); g.gain.exponentialRampToValueAtTime(0.18, actx.currentTime + i * 0.14 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + i * 0.14 + 0.45); o.connect(g).connect(actx.destination); o.start(actx.currentTime + i * 0.14); o.stop(actx.currentTime + i * 0.14 + 0.5); });
@@ -105,16 +111,18 @@ function ding() {
 
 /* ------------------------------------------------------------- sections */
 const GROUPS = [
-  ["امروز", [["overview", "chart", "داشبورد"], ["alerts", "bell", "هشدارها"], ["orders", "receipt", "سفارش‌های زنده"]]],
+  ["امروز", [["overview", "chart", "داشبورد"], ["alerts", "bell", "هشدارها"], ["orders", "receipt", "سفارش‌های زنده"], ["cash", "cash", "صندوق و بستن روز"]]],
   ["پول", [["sales", "trend", "فروش"], ["finance", "card", "سود و زیان"], ["goals", "flame", "هدف و پیش‌بینی"]]],
-  ["منو و مشتری", [["products", "sparkle", "تحلیل منو"], ["menu", "menu", "منو و قیمت"], ["customers", "users", "مشتری‌ها"], ["insights", "heart", "تحلیل مشتری"], ["campaigns", "mega", "کمپین"], ["automations", "bolt", "پیام خودکار"], ["loyalty", "crown", "باشگاه مشتری"], ["reviews", "star", "نظرها"], ["events", "events", "رویدادها"]]],
-  ["اداره‌ی کافه", [["branches", "pin", "شعبه‌ها"], ["inventory", "layers", "انبار و خرید"], ["staff", "profile", "پرسنل و شیفت"], ["service", "clock", "کیفیت سرویس"], ["tasks", "check", "چک‌لیست و تعمیرات"]]],
-  ["مدیریت", [["reports", "dl", "گزارش و خروجی"], ["access", "shield", "دسترسی‌ها"]]],
+  ["مشتری‌ها", [["customers", "users", "پرونده‌ی مشتری‌ها"], ["insights", "heart", "تحلیل مشتری"], ["marketing", "trend", "بازاریابی و جذب"], ["campaigns", "mega", "کمپین"], ["automations", "bolt", "پیام خودکار"], ["loyalty", "crown", "باشگاه مشتری"], ["reviews", "star", "نظرها"], ["events", "events", "رویدادها"]]],
+  ["منو", [["products", "sparkle", "تحلیل منو"], ["menu", "menu", "منو و قیمت"]]],
+  ["اداره‌ی کافه", [["branches", "pin", "شعبه‌ها"], ["inventory", "layers", "انبار و خرید"], ["staff", "profile", "پرسنل و شیفت"], ["service", "clock", "کیفیت سرویس"], ["tasks", "check", "اطلاعیه و چک‌لیست"]]],
+  ["مدیریت", [["reports", "dl", "گزارش و خروجی"], ["access", "shield", "دسترسی‌ها"], ["settings", "gear", "تنظیمات"]]],
 ];
 const SECTIONS = GROUPS.flatMap(([, s]) => s);
 const LEAD = {
   overview: "", alerts: "چیزایی که الان باید بهشون برسی.", orders: "", sales: "", finance: "درآمد و خرج و سودت، با همه‌ی جزئیات.", goals: "هدف بذار، ببین کجایی، ببین آخر ماه به کجا می‌رسی.",
   products: "کدوم آیتم‌ها پول درمیارن و کدوم فقط جا گرفتن.", insights: "مشتری‌ها کی‌ان، چقدر برمی‌گردن و کی دارن می‌رن.", inventory: "", staff: "", service: "", tasks: "", reports: "", access: "",
+  cash: "آخر شب صندوق رو بشمر و ببند؛ کسری و اضافه همین‌جا معلوم می‌شه.", marketing: "هر تومنی که برای آوردن مشتری خرج می‌کنی، چقدر برمی‌گرده.", customers: "همه‌ی اعضای باشگاه، با هر چی ازشون می‌دونیم.", settings: "", customer: "",
 };
 
 function orderBoard() {
@@ -152,68 +160,6 @@ function menuSec() {
         <label class="price-in"><input type="text" inputmode="numeric" data-price="${m.id}" value="${num(hub.prices[m.id] ?? m.price)}" aria-label="قیمت"><small>تومان</small></label>
         <label class="avail">${sw("av-" + m.id, !hub.soldOut.includes(m.id), "")}<span class="tiny">${hub.soldOut.includes(m.id) ? "تموم شد" : "موجوده"}</span></label>
       </div>`).join("")}</div></section>`).join("")}`;
-}
-
-let cq = "", cseg = "all";
-function customers() {
-  const seg = segments();
-  const me = appState().user;
-  const keys = ["all", "vip", "regular", "new", "risk", "bday"];
-  const rows = seg.list.filter(seg[cseg].f).filter((c) => !cq || (c.name + c.name_fa + c.phone).toLowerCase().includes(cq.toLowerCase())).sort((a, b) => b.spend - a.spend);
-  return `
-    <div class="seg-chips">${keys.map((k) => `<button class="chip" data-cseg="${k}" aria-pressed="${cseg === k}">${seg[k].n}<span class="n">${num(seg.list.filter(seg[k].f).length)}</span></button>`).join("")}</div>
-    <div class="cbar"><div class="search"><span>${icon("search")}</span><input id="cq" type="search" value="${esc(cq)}" placeholder="اسم یا شماره"></div><button class="btn btn--sm btn--soft" id="csv">${icon("dl")}خروجی اکسل</button><button class="btn btn--sm" data-go="campaigns">${icon("mega")}به این گروه پیام بده</button></div>
-    ${me ? `<button class="crow me-row" data-cust="APP"><span class="cav">${esc(me.name[0])}</span><span class="row-main"><span class="row-t">${esc(me.name)} <span class="app-pill">همین گوشی – زنده</span></span><span class="row-s" dir="ltr">${digits(me.phone)}</span></span><span class="c-num">${num(appState().orders.length)}<small>سفارش</small></span><span class="c-num">${num(appState().points)}<small>امتیاز</small></span>${icon("chev", "chev")}</button>` : ""}
-    <div class="clist">${rows.slice(0, 60).map((c) => { const t = seg.tierOf(c.points); const days = Math.floor((Date.now() - c.last) / DAY); return `
-      <button class="crow" data-cust="${c.id}"><span class="cav" style="--tier:${t.color}">${esc(loc(c)[0])}</span>
-        <span class="row-main"><span class="row-t">${esc(loc(c))} <span class="tier-pill" style="--tier:${t.color}">${esc(loc(t))}</span></span><span class="row-s">${esc(loc(branch(c.branch)))} – آخرین بار ${days ? `${num(days)} روز پیش` : "امروز"}${c.tags.map((tg) => ` – <span class="ctag">${esc(tg[1])}</span>`).join("")}</span></span>
-        <span class="c-num cv">${num(c.visits)}<small>بار</small></span><span class="c-num">${kmoney(c.spend)}<small>خرید</small></span>${icon("chev", "chev")}</button>`; }).join("")}</div>
-    ${rows.length > 60 ? `<p class="tiny demo-note">۶۰ تا از ${num(rows.length)} تا رو نشون می‌دیم. برای بقیه جست‌وجو کن.</p>` : ""}`;
-}
-function customerSheet(id) {
-  const seg = segments();
-  if (id === "APP") {
-    const s = appState(), u = s.user;
-    sheet(`<div class="cs-head"><span class="cav lg">${esc(u.name[0])}</span><div><h2>${esc(u.name)}</h2><p class="small" dir="ltr">${digits(u.phone)}</p></div></div>
-      <div class="kpis sm"><div class="kpi"><span>امتیاز</span><b>${num(s.points)}</b></div><div class="kpi"><span>مهر</span><b>${num(s.stamps)}</b></div><div class="kpi"><span>سفارش</span><b>${num(s.orders.length)}</b></div></div>
-      <p class="group-label">کارهای سریع — رو اپ همین گوشی اعمال می‌شه</p>
-      <div class="act-grid"><button class="btn btn--soft" data-act="stamps">${icon("coffee")}۲ تا مهر هدیه بده</button><button class="btn btn--soft" data-act="voucher">${icon("tag")}کوپن ٪۱۵ بفرست</button><button class="btn btn--soft" data-act="points">${icon("crown")}۳۰۰ امتیاز بده</button></div>`, { label: u.name, onMount(b) {
-      $$("[data-act]", b).forEach((x) => x.addEventListener("click", () => {
-        const a = x.dataset.act;
-        const bc = { id: "B" + Date.now(), at: Date.now(), to: "me",
-          title: a === "stamps" ? "2 stamps from Conpanna ☕" : a === "points" ? "300 bonus points" : "A 15% voucher for you", title_fa: a === "stamps" ? "۲ تا مهر هدیه از کن‌پانا ☕" : a === "points" ? "۳۰۰ امتیاز هدیه" : "یه کوپن ٪۱۵ مال تو",
-          body: "Thanks for being a regular.", body_fa: "مرسی که همیشه بهمون سر می‌زنی.",
-          ...(a === "stamps" ? { stamps: 2 } : a === "points" ? { points: 300 } : { offer: { kind: "pct", value: 0.15, title: "15% off — from the team", title_fa: "٪۱۵ تخفیف — از طرف بچه‌ها" }, code: "THANKS15" }) };
-        setHub((h) => ({ broadcasts: [...h.broadcasts, bc].slice(-40) }));
-        log(`برای ${u.name} ${a === "stamps" ? "۲ تا مهر" : a === "points" ? "۳۰۰ امتیاز" : "کوپن ٪۱۵"} فرستاد`);
-        toast("فرستاده شد؛ اپ رو ببین", "send"); haptic(10);
-      }));
-    } });
-    return;
-  }
-  const c = cust(id); const t = seg.tierOf(c.points);
-  const mine = S.orders.filter((o) => o.customer === id && o.status === "done");
-  const hist = mine.slice(-6).reverse();
-  const favs = {}; mine.forEach((o) => o.lines.forEach((l) => { favs[l.id] = (favs[l.id] || 0) + l.qty; }));
-  const favTop = Object.entries(favs).sort((a, b) => b[1] - a[1]).slice(0, 3);
-  const gap = mine.length > 1 ? (mine.at(-1).at - mine[0].at) / DAY / (mine.length - 1) : 0;
-  sheet(`<div class="cs-head"><span class="cav lg" style="--tier:${t.color}">${esc(loc(c)[0])}</span><div><h2>${esc(loc(c))}</h2><p class="small"><span dir="ltr">${digits(c.phone)}</span> – <span class="tier-pill" style="--tier:${t.color}">${esc(loc(t))}</span></p></div></div>
-    <div class="kpis sm"><div class="kpi"><span>دفعات</span><b>${num(c.visits)}</b></div><div class="kpi"><span>کل خرید</span><b>${kmoney(c.spend)}</b></div><div class="kpi"><span>میانگین فاکتور</span><b>${kmoney(c.spend / (c.visits || 1))}</b></div><div class="kpi"><span>امتیاز</span><b>${num(c.points)}</b></div></div>
-    <div class="group" style="margin-top:14px">
-      <div class="row"><span class="row-ic soft">${icon("heart")}</span><span class="row-main"><span class="row-t">معمولاً چی می‌گیره</span><span class="row-s">${favTop.map(([i]) => esc(loc(item(i)))).join(" – ") || esc(loc(item(c.fav)))}</span></span></div>
-      <div class="row"><span class="row-ic soft">${icon("clock")}</span><span class="row-main"><span class="row-t">هر چند وقت یه بار میاد</span><span class="row-s">${gap ? `حدوداً هر ${num(Math.max(1, Math.round(gap)))} روز` : "تازه اومده"} – آخرین بار ${ago(c.last)}</span></span></div>
-      <div class="row"><span class="row-ic soft">${icon("pin")}</span><span class="row-main"><span class="row-t">شعبه‌ی اصلیش</span><span class="row-s">${esc(loc(branch(c.branch)))} – عضو از ${fmtDay(new Date(c.joined))}</span></span></div>
-      <div class="row"><span class="row-ic soft">${icon("cake")}</span><span class="row-main"><span class="row-t">ماه تولد</span><span class="row-s">${new Intl.DateTimeFormat("fa-IR", { month: "long" }).format(new Date(2026, c.bmonth, 15))}${c.referrals ? ` – ${num(c.referrals)} نفر رو دعوت کرده` : ""}</span></span></div>
-    </div>
-    <p class="group-label">سفارش‌های اخیر</p>
-    <div class="group">${hist.map((o) => `<div class="row plain"><span class="row-main"><span class="row-t">${o.lines.map((l) => esc(loc(item(l.id)))).join("، ")}</span><span class="row-s">${fmtDay(new Date(o.at))} – ${esc(loc(branch(o.branch)))}</span></span><span class="row-v">${money(o.total)}</span></div>`).join("") || `<div class="row plain"><span class="row-s">هنوز سفارشی نداشته</span></div>`}</div>
-    <p class="group-label">یادداشت برای بچه‌ها</p>
-    <textarea class="note-in" id="cnote" rows="2" placeholder="مثلاً به بادوم‌زمینی حساسیت داره، میز کنار پنجره رو دوست داره">${esc(A.notes[id] || "")}</textarea>
-    <div class="act-grid" style="margin-top:14px"><button class="btn btn--soft" data-a="voucher">${icon("tag")}کوپن بفرست</button><button class="btn btn--soft" data-a="stamps">${icon("coffee")}مهر هدیه بده</button><button class="btn btn--soft" data-a="msg">${icon("send")}پیام بده</button></div>`,
-  { label: loc(c), onMount(b) {
-    $("#cnote", b).addEventListener("input", (e) => setA({ notes: { ...A.notes, [id]: e.target.value } }));
-    $$("[data-a]", b).forEach((x) => x.addEventListener("click", () => { toast(`برای ${c.name_fa} فرستاده شد`, "send"); log(`برای ${c.name_fa} ${x.textContent.trim()}`); haptic(8); }));
-  } });
 }
 
 /* campaigns */
@@ -326,13 +272,14 @@ function reviews() {
 }
 
 /* ---------------------------------------------------------------- shell */
-const VIEWS = { orders: orderBoard, menu: menuSec, customers, campaigns, automations, loyalty, events: eventsSec, reviews, ...CEO, ...OPS };
+const VIEWS = { orders: orderBoard, menu: menuSec, campaigns, automations, loyalty, events: eventsSec, reviews, ...CEO, ...OPS, ...CRM, ...MORE,
+  tasks: () => annCard() + OPS.tasks(), branches: () => CEO.branches() + compareCard() };
 function shell() {
   document.body.innerHTML = `
   <div class="adm" id="adm">
     <aside class="side" id="side">
-      <div class="side-top"><a class="side-logo" href="index.html">${LOCKUP}</a><span class="side-k">پنل مدیرعامل</span></div>
-      <nav class="side-nav">${GROUPS.map(([g, s]) => `<p class="nav-g">${g}</p>${s.map(([k, ic, t]) => `<button class="nav-i" data-sec="${k}" aria-current="${A.section === k}">${icon(ic)}<span>${t}</span>${k === "orders" ? `<i class="nav-badge" id="nb"></i>` : k === "alerts" ? `<i class="nav-badge warn" id="nb-al"></i>` : ""}</button>`).join("")}`).join("")}</nav>
+      <div class="side-top"><a class="side-logo" href="index.html">${LOCKUP}</a><span class="side-k">پنل مدیرعامل</span><button class="icon-btn sm side-col" id="side-col" aria-label="جمع کردن منو" data-tip="جمع کردن منو  [">${icon("back")}</button></div>
+      <nav class="side-nav">${GROUPS.map(([g, s]) => `<p class="nav-g">${g}</p>${s.map(([k, ic, t]) => `<button class="nav-i" data-sec="${k}" data-tip="${t}" aria-current="${A.section === k}">${icon(ic)}<span>${t}</span>${k === "orders" ? `<i class="nav-badge" id="nb"></i>` : k === "alerts" ? `<i class="nav-badge warn" id="nb-al"></i>` : ""}</button>`).join("")}`).join("")}</nav>
       <div class="side-foot">
         <select id="scope" aria-label="شعبه"><option value="all">همه‌ی شعبه‌ها</option>${BRANCHES.map((b) => `<option value="${b.id}" ${A.scope === b.id ? "selected" : ""}>${esc(loc(b))}</option>`).join("")}</select>
         <div class="side-row"><button class="icon-btn" id="theme" aria-label="تم">${icon("moon")}</button><a class="icon-btn" href="index.html" aria-label="باز کردن اپ">${icon("coffee")}</a><button class="icon-btn" id="logout" aria-label="خروج">${icon("out")}</button></div>
@@ -341,9 +288,10 @@ function shell() {
     </aside>
     <div class="scrim-side" id="scrim-side"></div>
     <main class="amain">
-      <header class="ahead"><button class="icon-btn menu-btn" id="menu-btn" aria-label="منو">${icon("grid")}</button><div><p class="eyebrow" id="a-eyebrow"></p><h1 id="a-title"></h1></div><span class="live-dot" id="live-dot" hidden><span class="dot pulse"></span>زنده</span></header>
+      <header class="ahead"><button class="icon-btn menu-btn" id="menu-btn" aria-label="منو">${icon("grid")}</button><div class="ah-t"><p class="eyebrow" id="a-eyebrow"></p><h1 id="a-title"></h1></div><span class="live-dot" id="live-dot" hidden><span class="dot pulse"></span>زنده</span>
+        <div class="ah-acts"><button class="ah-search" id="ah-search" aria-label="جست‌وجو">${icon("search")}<span>جست‌وجو…</span><kbd dir="ltr">⌘K</kbd></button><button class="icon-btn ah-bell" id="ah-bell" aria-label="هشدارها" data-tip="هشدارها">${icon("bell")}<i id="ah-bd"></i></button></div></header>
       <p class="small sec-lead" id="a-lead" hidden></p>
-      <div id="sec" class="sec-body"></div>
+      <div id="sec" class="sec-body" tabindex="-1"></div>
     </main>
   </div>
   <div id="print-root" aria-hidden="true"></div>
@@ -353,16 +301,24 @@ function shell() {
   $("#theme").addEventListener("click", () => { const d = document.documentElement.dataset.mode === "dark"; applyTheme(d ? "light" : "dark", true); try { const s = JSON.parse(localStorage.getItem("conpanna.v1") || "{}"); s.theme = d ? "light" : "dark"; localStorage.setItem("conpanna.v1", JSON.stringify(s)); } catch (e) {} });
   $("#logout").addEventListener("click", () => { setA({ authed: false }); login(); });
   $("#menu-btn").addEventListener("click", () => $("#adm").classList.toggle("nav-open"));
+  $("#side-col").addEventListener("click", toggleSide);
+  $("#ah-search").addEventListener("click", openPalette);
+  $("#ah-bell").addEventListener("click", () => go("alerts"));
+  sortable($("#sec"));
+  applyUi();
   $("#scrim-side").addEventListener("click", () => $("#adm").classList.remove("nav-open"));
 }
-function go(sec) { if (!VIEWS[sec]) sec = "overview"; setA({ section: sec }); $("#adm").classList.remove("nav-open"); render(); scrollTo(0, 0); }
+function go(sec) { if (!VIEWS[sec]) sec = "overview"; setA({ section: sec }); $("#adm").classList.remove("nav-open"); render(); scrollTo(0, 0); $("#sec")?.focus({ preventScroll: true }); }
 
+let shown = "";
+const skel = () => `<div class="kpis k4">${'<div class="kpi sk-card"><i class="sk w40"></i><i class="sk w70 h24"></i><i class="sk w55"></i></div>'.repeat(4)}</div><div class="cards g2">${'<section class="card sk-card"><i class="sk w30"></i><i class="sk h160"></i><i class="sk w55"></i></section>'.repeat(2)}</div>`;
 function render() {
   if (!A.authed) return;
   const el = $("#sec"); if (!el) return;
   if (!VIEWS[A.section]) A.section = "overview";
-  const t = SECTIONS.find((s) => s[0] === A.section)[2];
+  const t = A.section === "customer" ? crmTitle() : SECTIONS.find((s) => s[0] === A.section)[2];
   $("#a-title").textContent = t;
+  document.title = `${t} · پنل کن‌پانا`;
   $("#a-eyebrow").textContent = `${A.scope === "all" ? "همه‌ی شعبه‌ها" : loc(branch(A.scope))} – ${fmtDay(new Date())}`;
   $("#a-lead").hidden = !LEAD[A.section]; $("#a-lead").textContent = LEAD[A.section] || "";
   $$(".nav-i").forEach((b) => b.setAttribute("aria-current", b.dataset.sec === A.section));
@@ -370,11 +326,21 @@ function render() {
   $("#nb").textContent = live ? digits(live) : ""; $("#nb").classList.toggle("on", !!live);
   const al = alerts().filter((a) => a.k !== "info").length;
   $("#nb-al").textContent = al ? digits(al) : ""; $("#nb-al").classList.toggle("on", !!al);
+  $("#ah-bd").classList.toggle("on", !!al);
   $("#live-dot").hidden = !A.live;
-  const keepY = scrollY;
-  el.innerHTML = VIEWS[A.section]();
-  scrollTo(0, keepY);
-  wire(el);
+  $$(".nav-i").forEach((b) => b.toggleAttribute("data-near", b.dataset.sec === "customers" && A.section === "customer"));
+  const key = A.section + "|" + (A.section === "customer" ? A.cid : "");
+  if (key === shown) { const y = scrollY; el.innerHTML = VIEWS[A.section](); scrollTo(0, y); wire(el); return; }
+  // a new section: show its outline at once, then fill it in
+  shown = key;
+  el.classList.remove("sec-in");
+  el.innerHTML = skel();
+  requestAnimationFrame(() => setTimeout(() => {
+    if (shown !== key) return;
+    el.innerHTML = VIEWS[A.section]();
+    wire(el);
+    void el.offsetWidth; el.classList.add("sec-in");
+  }, 0));
 }
 function wire(el) {
   $$("[data-go]", el).forEach((b) => b.addEventListener("click", () => go(b.dataset.go)));
@@ -385,11 +351,8 @@ function wire(el) {
   $("#sim", el)?.addEventListener("click", () => simOrder());
   $$("[data-price]", el).forEach((inp) => inp.addEventListener("change", () => { const v = +inp.value.replace(/[۰-۹]/g, (d) => "۰۱۲۳۴۵۶۷۸۹".indexOf(d)).replace(/\D/g, ""); const id = inp.dataset.price; if (!v) return; setHub((h) => ({ prices: { ...h.prices, [id]: v === item(id).price ? undefined : v } })); log(`قیمت ${item(id).name_fa} رو کرد ${num(v)} تومان`); toast("قیمت تو اپ هم عوض شد", "tag"); }));
   $$('input[name^="av-"]', el).forEach((inp) => inp.addEventListener("change", () => { const id = inp.name.slice(3); setHub((h) => ({ soldOut: inp.checked ? h.soldOut.filter((x) => x !== id) : [...h.soldOut, id] })); log(`${item(id).name_fa} رو ${inp.checked ? "دوباره موجود" : "«تموم شد»"} زد`); toast(inp.checked ? `${item(id).name_fa} دوباره موجود شد` : `${item(id).name_fa} تموم شد`, inp.checked ? "check" : "info"); }));
-  $$("[data-cseg]", el).forEach((b) => b.addEventListener("click", () => { cseg = b.dataset.cseg; render(); }));
   $$("[data-rf]", el).forEach((b) => b.addEventListener("click", () => { rf = b.dataset.rf; render(); }));
-  $("#cq", el)?.addEventListener("input", (e) => { cq = e.target.value; const pos = e.target.selectionStart; render(); const n = $("#cq"); n.focus(); n.setSelectionRange(pos, pos); });
-  $$("[data-cust]", el).forEach((b) => b.addEventListener("click", () => customerSheet(b.dataset.cust)));
-  $("#csv", el)?.addEventListener("click", exportCustomers);
+  $$("[data-cust]", el).filter((b) => !b.closest("#crm-list")).forEach((b) => b.addEventListener("click", () => openCustomer(b.dataset.cust)));
   if (A.section === "campaigns") wireCampaigns(el);
   $$('input[name^="j-"]', el).forEach((inp) => inp.addEventListener("change", () => { const k = inp.name.slice(2); setHub((h) => ({ journeys: { ...h.journeys, [k]: inp.checked } })); render(); }));
   if ($("#stampseg", el)) segmented($("#stampseg", el), (v) => { setHub((h) => ({ loyalty: { ...h.loyalty, stamps: +v } })); log(`کارت مهر رو کرد ${num(+v)} تایی`); toast(`کارت مهر: ${num(+v)} نوشیدنی`, "coffee"); });
@@ -402,17 +365,85 @@ function wire(el) {
 
   wireCeo(el);
   wireOps(el);
-}
-function exportCustomers() {
-  const seg = segments();
-  const rows = [["id", "name", "phone", "branch", "tier", "visits", "spend_toman", "points", "last_visit"], ...seg.list.filter(seg[cseg].f).map((c) => [c.id, c.name, c.phone, c.branch, seg.tierOf(c.points).name, c.visits, c.spend, c.points, new Date(c.last).toISOString().slice(0, 10)])];
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob(["﻿" + rows.map((r) => r.join(",")).join("\n")], { type: "text/csv" }));
-  a.download = `conpanna-customers-${cseg}.csv`; document.body.appendChild(a); a.click(); a.remove();
-  log("لیست مشتری‌ها رو خروجی گرفت");
-  toast("فایل دانلود شد", "dl");
+  wireCrm(el);
+  wireMore(el);
 }
 
+/* ------------------------------------------------- small things, everywhere */
+function applyUi() {
+  document.body.classList.toggle("compact", !!A.compact);
+  const h = $(".ahead"); if (h) document.documentElement.style.setProperty("--ahead-h", h.offsetHeight + "px");
+  $("#adm")?.classList.toggle("collapsed", !!A.collapsed);
+  const c = $("#side-col"); if (c) { c.setAttribute("aria-label", A.collapsed ? "باز کردن منو" : "جمع کردن منو"); c.dataset.tip = A.collapsed ? "باز کردن منو  [" : "جمع کردن منو  ["; }
+}
+function toggleSide() { setA({ collapsed: !A.collapsed }); applyUi(); if (A.section === "settings") render(); }
+function resetAll() { A = { ...DEF(), authed: true, section: "overview" }; save(); memo = null; applyUi(); go("overview"); }
+
+// click a column title to sort; numbers in Persian, with units, sort as numbers
+function cellVal(t) {
+  const s = t.replace(/[۰-۹]/g, (d) => "۰۱۲۳۴۵۶۷۸۹".indexOf(d)).replace(/[٬,]/g, "").replace(/٫/g, ".");
+  const m = s.match(/[−-]?\d+(\.\d+)?/); if (!m) return t.trim();
+  let v = parseFloat(m[0].replace("−", "-"));
+  if (/میلیارد/.test(s)) v *= 1e9; else if (/میلیون/.test(s)) v *= 1e6; else if (/هزار/.test(s)) v *= 1e3;
+  if (/کسری/.test(s)) v = -Math.abs(v);
+  return v;
+}
+function sortable(root) {
+  root.addEventListener("click", (e) => {
+    const th = e.target.closest(".tbl thead th"); if (!th || !th.textContent.trim()) return;
+    const table = th.closest("table"), tb = table.tBodies[0]; if (!tb || tb.rows.length < 2 || table.classList.contains("nosort")) return;
+    const i = [...th.parentNode.children].indexOf(th);
+    const dir = th.getAttribute("aria-sort") === "descending" ? "ascending" : "descending";
+    $$("th", table).forEach((x) => x.removeAttribute("aria-sort")); th.setAttribute("aria-sort", dir);
+    const rows = [...tb.rows].map((r) => [r, cellVal(r.cells[i]?.textContent || "")]);
+    rows.sort((a, b) => { const c = typeof a[1] === "number" && typeof b[1] === "number" ? a[1] - b[1] : typeof a[1] === "number" ? -1 : typeof b[1] === "number" ? 1 : String(a[1]).localeCompare(String(b[1]), "fa"); return dir === "ascending" ? c : -c; });
+    rows.forEach(([r]) => tb.appendChild(r));
+    haptic(4);
+  });
+}
+
+// one floating tooltip for anything with data-tip; chart parts follow the pointer
+function tips() {
+  const tip = document.createElement("div"); tip.className = "tipx"; tip.setAttribute("role", "tooltip");
+  let cur = null, follow = false, hideT = 0;
+  const place = (x, y, r) => {
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    let left = r ? r.left + r.width / 2 - w / 2 : x - w / 2, top = r ? r.top - h - 8 : y - h - 14;
+    if (top < 6) top = r ? r.bottom + 8 : y + 18;
+    tip.style.transform = `translate(${Math.round(Math.max(8, Math.min(innerWidth - w - 8, left)))}px, ${Math.round(top)}px)`;
+  };
+  const hide = () => { tip.classList.remove("on"); cur = null; };
+  document.addEventListener("pointerover", (e) => {
+    const t = e.target.closest?.("[data-tip]");
+    if (t === cur) return;
+    cur = t;
+    if (!t || !t.dataset.tip || (t.classList.contains("nav-i") && !document.querySelector(".adm.collapsed"))) { tip.classList.remove("on"); return; }
+    if (!tip.isConnected) document.body.appendChild(tip);
+    tip.textContent = t.dataset.tip; tip.classList.add("on");
+    follow = t instanceof SVGElement;
+    follow ? place(e.clientX, e.clientY) : place(0, 0, t.getBoundingClientRect());
+    clearTimeout(hideT); if (e.pointerType === "touch") hideT = setTimeout(hide, 1800);
+  });
+  document.addEventListener("pointermove", (e) => { if (cur && follow) place(e.clientX, e.clientY); }, { passive: true });
+  addEventListener("scroll", hide, { passive: true, capture: true });
+  addEventListener("pointerdown", (e) => { if (e.pointerType !== "touch") hide(); }, { passive: true });
+}
+
+addEventListener("resize", () => { const h = $(".ahead"); if (h) document.documentElement.style.setProperty("--ahead-h", h.offsetHeight + "px"); }, { passive: true });
+
+// keys: ⌘K or / to search, [ for the sidebar, ? for help, G then a letter to jump
+let gAt = 0;
+addEventListener("keydown", (e) => {
+  if (!A.authed || !$("#adm")) return;
+  if ((e.metaKey || e.ctrlKey) && e.code === "KeyK") { e.preventDefault(); openPalette(); return; }
+  if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest?.("input,textarea,select,[contenteditable]")) return;
+  if (document.querySelector(".sheet-wrap,.pal-wrap")) return;
+  if (e.code === "Slash" && !e.shiftKey) { e.preventDefault(); openPalette(); }
+  else if (e.code === "Slash" && e.shiftKey) helpSheet();
+  else if (e.code === "BracketLeft" || e.code === "BracketRight") toggleSide();
+  else if (e.code === "KeyG") gAt = Date.now();
+  else if (Date.now() - gAt < 1000) { const to = { KeyO: "orders", KeyC: "customers", KeyD: "overview", KeyA: "alerts", KeyS: "sales", KeyF: "finance", KeyI: "inventory", KeyM: "marketing" }[e.code]; gAt = 0; if (to) { e.preventDefault(); go(to); } }
+});
 // one printable pack for a meeting: dashboard, P&L and branches
 function printPack() {
   const pr = $("#print-root");
@@ -459,10 +490,13 @@ function login() {
 }
 
 /* ----------------------------------------------------------------- boot */
-const ctx = { S, A: () => A, setA, render: () => render(), go, inScope, orders, boardOrders, log, stock, checklist, app: appState, printPack };
-initCeo(ctx); initOps(ctx);
+const ctx = { S, A: () => A, setA, render: () => render(), go, inScope, orders, boardOrders, log, stock, checklist, app: appState, printPack,
+  cfg: () => cfg(), sections: () => GROUPS.flatMap(([g, s]) => s.map((x) => [...x, g])), simOrder: () => simOrder(), toggleSide, csvExport, reset: resetAll, applyUi };
+initCeo(ctx); initOps(ctx); initCrm(ctx); initMore(ctx);
 applyLang();
 applyTheme();
+tips();
+netWatch();
 if (A.authed) { shell(); render(); } else login();
 let prevNew = boardOrders().filter((o) => o.status === "new").map((o) => o.id);
 onHub(() => {

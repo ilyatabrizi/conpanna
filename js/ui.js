@@ -125,13 +125,39 @@ export function replay(el, cls) { if (!el) return; el.classList.remove(cls); voi
 
 /* ------------------------------------------------------------------ toast */
 let toastT = 0;
-export function toast(msg, ico = "check") {
+// an optional action turns it into an undo bar: it stays a little longer and
+// waits while the pointer is on it
+export function toast(msg, ico = "check", { action = "", onAction = null, ms = 0 } = {}) {
   const root = $("#toast-root");
-  root.innerHTML = `<div class="toast">${icon(ico)}<span>${msg}</span></div>`;
+  root.innerHTML = `<div class="toast ${action ? "has-act" : ""}" role="status">${icon(ico)}<span>${msg}</span>${action ? `<button type="button" class="toast-act">${action}</button>` : ""}</div>`;
   const t = root.firstElementChild;
   requestAnimationFrame(() => t.classList.add("in"));
   clearTimeout(toastT);
-  toastT = setTimeout(() => { t.classList.remove("in"); setTimeout(() => t.remove(), 400); }, 2600);
+  const hide = () => { t.classList.remove("in"); setTimeout(() => t.remove(), 400); };
+  const arm = () => { clearTimeout(toastT); toastT = setTimeout(hide, ms || (action ? 5200 : 2600)); };
+  if (action) {
+    $(".toast-act", t).addEventListener("click", () => { clearTimeout(toastT); hide(); haptic(6); onAction?.(); });
+    t.addEventListener("pointerenter", () => clearTimeout(toastT));
+    t.addEventListener("pointerleave", arm);
+  }
+  arm();
+}
+
+// a small pill while the connection is gone; a toast when it's back
+export function netWatch() {
+  let pill = null;
+  const paint = (first) => {
+    const off = navigator.onLine === false;
+    if (off && !pill) {
+      pill = document.createElement("div"); pill.className = "net-pill"; pill.setAttribute("role", "status");
+      pill.innerHTML = `<i></i>${L("You're offline — the menu and your card still work", "اینترنت قطعه؛ منو و کارتت هنوز کار می‌کنه")}`;
+      document.body.appendChild(pill); requestAnimationFrame(() => pill.classList.add("in"));
+    } else if (!off && pill) {
+      const p = pill; pill = null; p.classList.remove("in"); setTimeout(() => p.remove(), 400);
+      if (!first) toast(L("Back online", "دوباره وصل شدی"), "wifi");
+    }
+  };
+  addEventListener("online", () => paint()); addEventListener("offline", () => paint()); paint(true);
 }
 
 /* ------------------------------------------------------------------ sheet */
