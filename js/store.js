@@ -65,7 +65,7 @@ export function selLabel(it, sel) {
     if (g.one) { if ((v ?? 0) !== 0) out.push(name(g.choices[v])); }
     else (v || []).forEach((i) => out.push(name(g.choices[i])));
   });
-  return out.join(" · ");
+  return out.join(" – ");
 }
 const lineKey = (id, sel) => id + "|" + JSON.stringify(sel || {});
 

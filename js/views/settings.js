@@ -7,7 +7,6 @@ import { install, installed } from "../install.js";
 import { footer } from "./shared.js";
 import { applyTheme, applyCalm } from "../theme.js";
 import { getLang, digits } from "../i18n.js";
-import { switchLang } from "../langbus.js";
 
 const CATS = () => [
   ["order", L("Order updates", "وضعیت سفارش"), L("Brewing, ready to collect, on the way", "آماده‌سازی، آماده‌ی تحویل، در راه"), "receipt", "#45281A"],
@@ -44,9 +43,6 @@ export default function settings(el, r) {
       </section>
 
       <section>
-        <p class="group-label">${L("Language", "زبان")}</p>
-        <div class="group" style="padding:12px">${seg([["fa", "فارسی"], ["en", "English"]], getLang(), "lang-seg")}</div>
-
         <p class="group-label">${L("Ordering", "سفارش")}</p>
         <div class="group">
           <div class="row"><span class="row-ic" style="--c:#45281A">${icon("takeaway")}</span><span class="row-main"><span class="row-t">${L("Order type", "نوع سفارش")}</span></span>
@@ -97,7 +93,6 @@ export default function settings(el, r) {
     $("#dbranch", el).addEventListener("change", (e) => { set({ branch: e.target.value }); toast(L("Saved", "ذخیره شد"), "check"); });
     $("#dpay", el).addEventListener("change", (e) => { set({ pay: e.target.value }); toast(L("Saved", "ذخیره شد"), "check"); });
     $("#addr", el).addEventListener("click", () => addressSheet(paint));
-    segmented($(".lang-seg", el), (v) => setTimeout(() => switchLang(v), 260));
     segmented($(".theme-seg", el), (v) => { set({ theme: v }); applyTheme(v, true); });
     $('input[name="reduceMotion"]', el).addEventListener("change", (e) => { set((s) => ({ prefs: { ...s.prefs, reduceMotion: e.target.checked } })); applyCalm(); });
     $('input[name="haptics"]', el).addEventListener("change", (e) => { set((s) => ({ prefs: { ...s.prefs, haptics: e.target.checked } })); haptic(10); });
@@ -105,7 +100,7 @@ export default function settings(el, r) {
     $("#about", el).addEventListener("click", () => sheet(`<h2>${L("About this preview", "درباره‌ی این نمونه")}</h2>
       <p class="body lead">${L("A working preview of a Coffee Conpanna app and owner panel, made by Alpha Agency from Conpanna's logo and Instagram. Ordering, check-in, loyalty, vouchers, events and notifications all work and are kept on this phone.", "یک نمونه‌ی کارا از اپ کافه کن‌پانا و پنل مدیریتش، ساخته‌ی آژانس آلفا بر اساس لوگو و اینستاگرام کن‌پانا. سفارش، ورود به کافه، باشگاه مشتریان، کوپن‌ها، رویدادها و اعلان‌ها همه کار می‌کنند و روی همین گوشی ذخیره می‌شوند.")}</p>
       <p class="body" style="margin-top:12px">${L("Placeholders until Conpanna confirms them: menu and prices, hours, events, Wi-Fi details. Payment stands in for the bank gateway.", "موارد نمونه تا تأیید کن‌پانا: منو و قیمت‌ها، ساعت کاری، رویدادها و وای‌فای. پرداخت هم جایگزین درگاه بانکی است.")}</p>
-      <a class="btn btn--block" href="https://alphaa.agency" target="_blank" rel="noopener" style="margin-top:20px" dir="ltr">Powered by Alpha Agency</a>`, { label: L("About", "درباره") }));
+      <a class="btn btn--block" href="https://alphaa.agency" target="_blank" rel="noopener" style="margin-top:20px" dir="ltr" lang="en"><span class="lat">Powered by Alpha Agency</span></a>`, { label: L("About", "درباره") }));
     $("#wipe", el).addEventListener("click", () => sheet(`<h2>${L("Clear everything?", "همه چیز پاک شود؟")}</h2><p class="small lead">${L("Your bag, orders, stamps, points, vouchers, tickets and settings on this phone will be removed.", "سبد، سفارش‌ها، مهرها، امتیازها، کوپن‌ها، بلیت‌ها و تنظیمات روی این گوشی پاک می‌شوند.")}</p><div class="two-btn"><button class="btn btn--soft" id="no" type="button">${L("Keep", "نگه دار")}</button><button class="btn btn--danger" id="yes" type="button">${L("Clear", "پاک کن")}</button></div>`,
       { label: L("Clear data", "پاک کردن"), onMount(b) { $("#no", b).addEventListener("click", () => closeSheet()); $("#yes", b).addEventListener("click", () => { reset(); closeSheet(); applyTheme("system", true); applyCalm(); toast(L("Cleared", "پاک شد"), "trash"); paint(); }); } }));
   }

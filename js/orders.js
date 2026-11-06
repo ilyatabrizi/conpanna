@@ -74,7 +74,7 @@ export function placeOrder() {
   const tierUp = addPoints(t.points);
   let challenge = false;
   if (!get().challengeDone && tried.length >= CHALLENGE.goal) { set({ challengeDone: true }); challenge = true; }
-  notify({ title: L(`Order #${code} received`, `سفارش #${digits(code)} ثبت شد`), body: L(`${o.count} items · ${o.mode === "delivery" ? "Delivery" : "Takeaway"} from ${branch(o.branch).name}.`, `${num(o.count)} قلم · ${o.mode === "delivery" ? "ارسال" : "بیرون‌بر"} از ${branch(o.branch).name_fa}.`), cat: "order", url: `#/order/${o.id}`, tag: o.id });
+  notify({ title: L(`Order #${code} received`, `سفارش #${digits(code)} ثبت شد`), body: L(`${o.count} items – ${o.mode === "delivery" ? "Delivery" : "Takeaway"} from ${branch(o.branch).name}.`, `${num(o.count)} قلم – ${o.mode === "delivery" ? "ارسال" : "بیرون‌بر"} از ${branch(o.branch).name_fa}.`), cat: "order", url: `#/order/${o.id}`, tag: o.id });
   ping({ type: "order", id: o.id });
   return { order: o, fresh, tierUp, challenge };
 }

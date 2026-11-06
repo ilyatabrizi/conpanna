@@ -20,12 +20,12 @@ export default function profile(el) {
       <section class="me">
         <span class="avatar" style="--tier:${t.color}">${u ? esc(u.name[0].toUpperCase()) : icon("profile")}</span>
         <div class="me-main">
-          ${u ? `<h1>${esc(u.name)}</h1><p class="small"><span dir="ltr">${digits(u.phone.replace(/(\d{4})(\d{3})(\d{4})/, "$1 $2 $3"))}</span> · <span class="tier-pill" style="--tier:${t.color}">${esc(loc(t))}</span></p>`
+          ${u ? `<h1>${esc(u.name)}</h1><p class="small"><span dir="ltr">${digits(u.phone.replace(/(\d{4})(\d{3})(\d{4})/, "$1 $2 $3"))}</span> – <span class="tier-pill" style="--tier:${t.color}">${esc(loc(t))}</span></p>`
               : `<h1>${L("Hello there", "سلام!")}</h1><p class="small">${L("Sign in to keep your stamps, points, orders and tickets.", "وارد شوید تا مهرها، امتیازها، سفارش‌ها و بلیت‌هایتان بماند.")}</p>`}
         </div>
         ${u ? `<button class="icon-btn" id="edit" type="button" aria-label="${L("Edit profile", "ویرایش پروفایل")}">${icon("edit")}</button>` : ""}
       </section>
-      ${u ? "" : `<button class="btn btn--block" id="signin" type="button" style="margin-top:16px">${icon("phone")}${L("Join with your number · 20% off", "عضویت با شماره · ٪۲۰ تخفیف")}</button>`}
+      ${u ? "" : `<button class="btn btn--block" id="signin" type="button" style="margin-top:16px">${icon("phone")}${L("Join with your number – 20% off", "عضویت با شماره – ٪۲۰ تخفیف")}</button>`}
 
       <div class="stats">
         <a href="#/rewards"><b>${num(s.points)}</b><span>${L("Points", "امتیاز")}</span></a>
@@ -33,11 +33,11 @@ export default function profile(el) {
         <a href="#/rewards"><b>${num(vs)}</b><span>${L("Vouchers", "کوپن")}</span></a>
       </div>
 
-      ${a ? `<a class="live-order" href="#/order/${a.id}" style="margin-top:14px"><span class="lo-code">#${digits(a.code)}</span><span class="row-main"><span class="eyebrow">${L("In progress", "در جریان")} · ${esc(loc(branch(a.branch)))}</span><span class="t3">${esc(stepTitle(STEPS[a.mode][stageOf(a)]))}</span></span>${icon("chev", "chev")}</a>` : ""}
+      ${a ? `<a class="live-order" href="#/order/${a.id}" style="margin-top:14px"><span class="lo-code">#${digits(a.code)}</span><span class="row-main"><span class="eyebrow">${L("In progress", "در جریان")} – ${esc(loc(branch(a.branch)))}</span><span class="t3">${esc(stepTitle(STEPS[a.mode][stageOf(a)]))}</span></span>${icon("chev", "chev")}</a>` : ""}
 
       <p class="group-label">${L("Your Conpanna", "کن‌پانای شما")}</p>
       <div class="group">
-        <a class="row" href="#/rewards"><span class="row-ic" style="--c:#B4682F">${icon("gift")}</span><span class="row-main"><span class="row-t">${L("Rewards & tier", "جوایز و سطح عضویت")}</span><span class="row-s">${esc(loc(t))} · ${L(`${num(s.points)} points`, `${num(s.points)} امتیاز`)}</span></span>${icon("chev", "chev")}</a>
+        <a class="row" href="#/rewards"><span class="row-ic" style="--c:#B4682F">${icon("gift")}</span><span class="row-main"><span class="row-t">${L("Rewards & tier", "جوایز و سطح عضویت")}</span><span class="row-s">${esc(loc(t))} – ${L(`${num(s.points)} points`, `${num(s.points)} امتیاز`)}</span></span>${icon("chev", "chev")}</a>
         <a class="row" href="#/rewards?s=invite"><span class="row-ic" style="--c:#6A5ACD">${icon("users")}</span><span class="row-main"><span class="row-t">${L("Invite friends", "دعوت از دوستان")}</span><span class="row-s">${L("You both get a free drink", "هر دو یک نوشیدنی رایگان")}</span></span>${icon("chev", "chev")}</a>
         <a class="row" href="#/orders"><span class="row-ic" style="--c:#45281A">${icon("receipt")}</span><span class="row-main"><span class="row-t">${L("Orders", "سفارش‌ها")}</span></span><span class="row-v">${s.orders.length ? num(s.orders.length) : ""}${icon("chev", "chev")}</span></a>
         <a class="row" href="#/events"><span class="row-ic" style="--c:#8A5A2E">${icon("ticket")}</span><span class="row-main"><span class="row-t">${L("Tickets", "بلیت‌ها")}</span></span><span class="row-v">${s.tickets.length ? num(s.tickets.length) : ""}${icon("chev", "chev")}</span></a>
@@ -51,10 +51,10 @@ export default function profile(el) {
         <a class="row" href="#/settings?s=notif"><span class="row-ic" style="--c:#E0663F">${icon("bell")}</span><span class="row-main"><span class="row-t">${L("Push notifications", "اعلان‌ها")}</span></span><span class="row-v">${notifLabel()}${icon("chev", "chev")}</span></a>
         ${installed() ? "" : `<button class="row" type="button" id="inst"><span class="row-ic" style="--c:#2F7BF6">${icon("dl")}</span><span class="row-main"><span class="row-t">${L("Add to Home Screen", "افزودن به صفحه‌ی اصلی")}</span><span class="row-s">${L("Opens full-screen, like an app", "مثل یک اپ، تمام‌صفحه باز می‌شود")}</span></span>${icon("chev", "chev")}</button>`}
         <button class="row" type="button" id="share"><span class="row-ic" style="--c:#94653A">${icon("share")}</span><span class="row-main"><span class="row-t">${L("Share Conpanna", "اشتراک‌گذاری کن‌پانا")}</span></span>${icon("chev", "chev")}</button>
-        <a class="row" href="https://instagram.com/${BRAND.instagram}" target="_blank" rel="noopener"><span class="row-ic" style="--c:#C13584">${icon("ig")}</span><span class="row-main"><span class="row-t" dir="ltr">@${BRAND.instagram}</span></span>${icon("chev", "chev")}</a>
-        <a class="row" href="admin.html"><span class="row-ic" style="--c:#24160F">${icon("grid")}</span><span class="row-main"><span class="row-t">${L("Owner panel", "پنل مدیریت")}</span><span class="row-s">${L("For Conpanna staff · demo PIN 1234", "برای کارکنان کن‌پانا · رمز نمونه ۱۲۳۴")}</span></span>${icon("chev", "chev")}</a>
+        <a class="row" href="https://instagram.com/${BRAND.instagram}" target="_blank" rel="noopener"><span class="row-ic" style="--c:#C13584">${icon("ig")}</span><span class="row-main"><span class="row-t lat">@${BRAND.instagram}</span></span>${icon("chev", "chev")}</a>
+        <a class="row" href="admin.html"><span class="row-ic" style="--c:#24160F">${icon("grid")}</span><span class="row-main"><span class="row-t">${L("Owner panel", "پنل مدیریت")}</span><span class="row-s">${L("For Conpanna staff – demo PIN 1234", "برای کارکنان کن‌پانا – رمز نمونه ۱۲۳۴")}</span></span>${icon("chev", "chev")}</a>
       </div>
-      ${u ? `<div class="group" style="margin-top:22px"><button class="row danger np" type="button" id="out"><span class="row-main"><span class="row-t">${L("Sign out", "خروج از حساب")}</span><span class="row-s">${L("Member since", "عضو از")} ${new Date(u.since).toLocaleDateString(L("en-GB", "fa-IR"), { month: "long", year: "numeric" })}</span></span>${icon("out")}</button></div>` : ""}
+      ${u ? `<div class="group" style="margin-top:22px"><button class="row danger np" type="button" id="out"><span class="row-main"><span class="row-t">${L("Sign out", "خروج از حساب")}</span><span class="row-s">${L("Member since", "عضو از")} ${L(new Date(u.since).toLocaleDateString("en-GB", { month: "long", year: "numeric" }), `${new Intl.DateTimeFormat("fa-IR-u-ca-persian", { month: "long" }).format(new Date(u.since))} ${new Intl.DateTimeFormat("fa-IR-u-ca-persian", { year: "numeric" }).format(new Date(u.since)).replace(/[^۰-۹]/g, "")}`)}</span></span>${icon("out")}</button></div>` : ""}
       ${footer()}
     </div>`;
     $("#signin", el)?.addEventListener("click", () => signInSheet());

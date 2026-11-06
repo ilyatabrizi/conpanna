@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -25,14 +25,13 @@
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="preload" href="assets/fonts/fraunces-600.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/yekan.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/app.css?v=91ad126c86">
+<link rel="stylesheet" href="css/app.css?v=9425dfbe03">
 <script>
   (function () {
     var d = document.documentElement, pref = "system", warm = false, calm = false;
     try { var s = JSON.parse(localStorage.getItem("conpanna.v1") || "{}"); pref = s.theme || "system"; calm = !!(s.prefs && s.prefs.reduceMotion); } catch (e) {}
     try { warm = sessionStorage.getItem("conpanna.booted") === "1"; } catch (e) {}
-    var lang = "fa"; try { lang = localStorage.getItem("conpanna.lang") || ((navigator.language || "").toLowerCase().indexOf("fa") === 0 ? "fa" : "en"); } catch (e) {}
-    d.lang = lang; d.dir = lang === "fa" ? "rtl" : "ltr";
+    d.lang = "fa"; d.dir = "rtl";
     var dark = pref === "dark" || (pref !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
     d.setAttribute("data-theme", pref);
     d.setAttribute("data-mode", dark ? "dark" : "light");
@@ -43,7 +42,7 @@
     setTimeout(function () { var b = document.getElementById("boot"); if (b) { b.parentNode.removeChild(b); d.classList.remove("booting"); } }, 9000);
   })();
 </script>
-<script src="js/qr.js?v=91ad126c86" defer></script>
+<script src="js/qr.js?v=9425dfbe03" defer></script>
 <link rel="modulepreload" href="js/brand.js">
 <link rel="modulepreload" href="js/data.js">
 <link rel="modulepreload" href="js/hero.js">
@@ -68,7 +67,7 @@
 <link rel="modulepreload" href="js/views/rewards.js">
 <link rel="modulepreload" href="js/views/settings.js">
 <link rel="modulepreload" href="js/views/shared.js">
-<script type="module" src="js/app.js?v=91ad126c86"></script>
+<script type="module" src="js/app.js?v=9425dfbe03"></script>
 </head>
 <body>
 
@@ -90,7 +89,6 @@
   <a class="bar-logo" id="bar-logo" href="#/" aria-label="Coffee Conpanna — home"></a>
   <span class="bar-title" id="bar-title" aria-hidden="true"></span>
   <div class="bar-right">
-    <button class="bar-btn bar-lang" id="bar-lang" type="button"></button>
     <button class="bar-btn" id="bar-bell" type="button" aria-label="Notifications"><span class="bell-dot" id="bell-dot"></span></button>
   </div>
 </header>

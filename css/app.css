@@ -821,7 +821,7 @@ select.row-select { appearance: none; -webkit-appearance: none; border: 0; backg
   .checkout { bottom: 24px; }
   .page-top { padding-top: calc(var(--safe-t) + var(--bar-h) + 30px); }
   .lt { font-size: 46px; }
-  .quick { grid-template-columns: repeat(3, 1fr); max-width: 760px; }
+  .quick { grid-template-columns: repeat(3, 1fr); max-width: none; }
   .home-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
   .home-cols > * + * { margin-top: 0 !important; }
   .items { grid-template-columns: 1fr 1fr; column-gap: 24px; }
@@ -897,11 +897,10 @@ html[dir="rtl"] .alt-name { direction: ltr; text-align: end; font-family: -apple
 .bar-lang .ico { width: 18px; height: 18px; }
 .lang-l { font: 700 12.5px/1 var(--sans); }
 
-/* tab bar mirrored for Persian: Home sits on the right, the bag on the left */
-html[dir="rtl"] .tabbar { flex-direction: row-reverse; padding-left: 0; padding-right: calc((100vw - var(--group-w)) / 2); }
-html[dir="rtl"] .tab:nth-child(1) { order: 5; } html[dir="rtl"] .tab:nth-child(2) { order: 4; } html[dir="rtl"] .tab:nth-child(3) { order: 3; } html[dir="rtl"] .tab:nth-child(4) { order: 2; } html[dir="rtl"] .tab:nth-child(5) { order: 1; }
-html[dir="rtl"] .tab-l { font-family: var(--fa); font-size: 10.5px; font-weight: 600; }
-html[dir="rtl"] .bag-l { font-family: var(--fa); }
+/* the tab bar stays English: Latin face, left-to-right, Home on the left */
+:root { --latin: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Segoe UI", Roboto, system-ui, sans-serif; }
+.tabbar, .tabbar * { font-family: var(--latin) !important; }
+html[dir="rtl"] .tab-l { letter-spacing: .005em !important; }
 
 /* --------------------------------------------------------- the cup hero */
 .hero {
@@ -959,7 +958,9 @@ html[dir="rtl"] .hero h1 em { font-style: normal; }
   .hero-brand { display: none; }
   .hero-stage { grid-column: 2; grid-row: 1 / 3; }
   .cup-wrap { width: min(34vw, 400px); }
-  .hero-in { grid-column: 1; grid-row: 1 / 3; margin: 0; padding-inline-start: max(24px, calc((100vw - var(--wrap)) / 2 + 24px)); }
+  .hero .wrap.hero-in { display: block; max-width: none; grid-column: 1; grid-row: 1 / 3; margin: 0; padding-inline-start: max(24px, calc((100vw - var(--wrap)) / 2 + 24px)); padding-inline-end: 24px; }
+  .hero-copy { max-width: 520px; }
+  .hero-cta { max-width: 420px; }
   .hero-copy { text-align: start; }
   .hero p.sub { margin-inline: 0; }
   .hero-cta { margin-inline: 0; }
@@ -1115,3 +1116,27 @@ html[dir="rtl"] .hero h1 em { font-style: normal; }
 .tr { font-family: "Fraunces", "Iowan Old Style", "Palatino Linotype", Georgia, serif; unicode-bidi: isolate; }
 html[dir="rtl"] .hero h1 .tr { font-weight: 600; font-size: clamp(42px, 12vw, 76px); line-height: .98; letter-spacing: -.03em; display: inline-block; }
 html[dir="rtl"] .hero h1 .tr em { font-style: italic; font-weight: 400; }
+
+/* Latin strings inside the Persian UI (codes, handles, Wi-Fi): a Latin face so
+   digits stay Latin — the Persian face draws 0–9 as ۰–۹ — and isolated direction */
+.lat { font-family: var(--latin) !important; direction: ltr; unicode-bidi: isolate; letter-spacing: .01em !important; }
+input.lat { text-align: left; }
+input.lat::placeholder { font-family: "IRANYekanX", Tahoma, sans-serif; direction: rtl; text-align: right; }
+/* Alpha's signature keeps its Latin face and tracking inside the Persian UI */
+.alpha-sig span, .boot-sig span { font-family: var(--latin) !important; }
+.alpha-sig span { letter-spacing: .24em !important; }
+#boot .boot-sig span { letter-spacing: .26em !important; }
+/* the Persian face has no italic: never let the browser fake one */
+html[dir="rtl"] .it { font-style: normal; font-weight: 500; }
+html[dir="rtl"] .it .tr { font-style: italic; font-weight: 400; }
+html[dir="rtl"] { font-synthesis: none; }
+/* stacked text inside rows never runs together */
+.row-main > .eyebrow, .row-main > .t3, .row-main > .lo-steps { display: block; }
+.row-main > .lo-steps { display: flex; }
+.live-order .t3 { margin-top: 3px; font-weight: 700; }
+#live:empty, #usual:empty { display: none; }
+.home-body > #usual + .quick, .home-body > #live + .quick { margin-top: 14px; }
+.home-body > #live + #usual { margin-top: 12px; }
+.hold:not(.pressing):not(.filled) .liq svg { opacity: 0; }
+.hold .liq svg { transition: opacity .25s; }
+html[dir="rtl"] .hold-in b { font-weight: 800; line-height: 1.4; }

@@ -22,11 +22,11 @@ export function itemSheet(id, { line } = {}) {
   sheet(`
     <div class="sheet-hero" style="--tile:${it.art.bg}">${hot ? STEAM : ""}${art(it)}${out ? `<span class="soldout-flag">${L("Sold out today", "امروز تمام شد")}</span>` : ""}</div>
     <div class="item-head">
-      <div><h2>${esc(loc(it))}</h2><div class="alt-name">${esc(L(it.name_fa, it.name))}</div></div>
+      <div><h2>${esc(loc(it))}</h2></div>
       <button class="icon-btn ${fav ? "on" : ""}" id="fav" type="button" aria-pressed="${fav}" aria-label="${L("Favourite", "علاقه‌مندی")}">${icon(fav ? "heartF" : "heart")}</button>
     </div>
     <p class="body lead">${esc(loc(it, "desc"))}</p>
-    ${groups.map((g) => `<fieldset class="opt-group"><legend>${esc(loc(g))}${g.one ? "" : ` <span class="tiny opt-optional">· ${L("optional", "اختیاری")}</span>`}</legend><div class="opts">
+    ${groups.map((g) => `<fieldset class="opt-group"><legend>${esc(loc(g))}${g.one ? "" : ` <span class="tiny opt-optional">– ${L("optional", "اختیاری")}</span>`}</legend><div class="opts">
       ${g.choices.map((ch, i) => `<label class="opt"><input type="${g.one ? "radio" : "checkbox"}" name="${g.id}" value="${i}" ${g.one ? (sel[g.id] === i ? "checked" : "") : ((sel[g.id] || []).includes(i) ? "checked" : "")}><span>${esc(L(ch[0], ch[1]))}${ch[2] ? `<small>+${num(ch[2] / 1000)}${L("k", " هزار")}</small>` : ""}</span></label>`).join("")}
     </div></fieldset>`).join("")}
     ${pair && !out ? `<div class="pair"><span class="tile sm" style="--tile:${pair.art.bg}">${art(pair)}</span><span class="row-main"><span class="eyebrow">${L("Goes well with", "کنارش بچسبد")}</span><span class="row-t">${esc(loc(pair))}</span><span class="row-s">${money(unitPrice(pair, defaultSel(pair)))}</span></span><button class="pair-add" type="button" id="pair" aria-pressed="false">${icon("plus")}<span>${L("Add", "افزودن")}</span></button></div>` : ""}
@@ -41,7 +41,7 @@ export function itemSheet(id, { line } = {}) {
       const paint = () => {
         if (out) { addBtn.innerHTML = L("Sold out today", "امروز تمام شد"); return; }
         const total = unitPrice(it, sel) * qty + (withPair ? unitPrice(pair, defaultSel(pair)) : 0);
-        addBtn.innerHTML = `${line ? L("Update", "به‌روزرسانی") : L("Add", "افزودن")} · ${money(total)}`;
+        addBtn.innerHTML = `${line ? L("Update", "به‌روزرسانی") : L("Add", "افزودن")} – ${money(total)}`;
         $("#q", b).textContent = num(qty);
       };
       paint();
@@ -94,8 +94,8 @@ export function branchSheet({ onPick, title, pick = true } = {}) {
       return `<div class="row branch-row" ${pick ? `aria-checked="${b.id === cur}"` : ""}>
         <span class="row-ic">${icon("pin")}</span>
         <button class="row-main" type="button" data-b="${b.id}">
-          <span class="row-t">${esc(loc(b))} <span class="tiny">· ${esc(loc(b, "city"))}</span></span>
-          <span class="row-s flexline"><span class="dot ${o.isOpen && !paused ? "" : "off"}"></span>${paused ? L("Online orders paused", "سفارش آنلاین موقتاً متوقف") : o.label}${o.isOpen && !paused ? ` · ${busyLabel(v)}` : ""}</span>
+          <span class="row-t">${esc(loc(b))} <span class="tiny">– ${esc(loc(b, "city"))}</span></span>
+          <span class="row-s flexline"><span class="dot ${o.isOpen && !paused ? "" : "off"}"></span>${paused ? L("Online orders paused", "سفارش آنلاین موقتاً متوقف") : o.label}${o.isOpen && !paused ? ` – ${busyLabel(v)}` : ""}</span>
         </button>
         ${pick ? `<span class="radio" aria-hidden="true"></span>` : ""}
         <a class="icon-btn" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.query)}" target="_blank" rel="noopener" aria-label="${L("Directions", "مسیریابی")}">${icon("map")}</a>
@@ -116,7 +116,7 @@ export function payGateway(amount, what) {
   return new Promise((resolve) => {
     let paid = false;
     sheet(`<div class="gateway">
-      <p class="eyebrow">${L("Secure payment · preview", "پرداخت امن · نمونه")}</p>
+      <p class="eyebrow">${L("Secure payment – preview", "پرداخت امن – نمونه")}</p>
       <h2 style="margin-top:8px">${money(amount)}</h2>
       <p class="small lead">${esc(what)}</p>
       <div class="card-art" dir="ltr"><div class="ca-top"><b>CONPANNA PAY</b>${icon("shield")}</div><div class="chip-i"></div><div class="pan">6037 •••• •••• 4821</div><div class="holder"><span>${L("Your bank card", "کارت بانکی شما")}</span><span>08/07</span></div></div>
@@ -143,13 +143,13 @@ export const footer = () => `
   <footer class="foot">
     <div style="--lg-cup:var(--caramel)">${LOCKUP}</div>
     <p class="it"><span class="tr" lang="tr" dir="ltr">${BRAND.tagline}</span> — ${L("this taste is yours.", "این طعم، مال توست.")}</p>
-    <div class="foot-links"><a href="#/menu">${L("Menu", "منو")}</a><a href="#/events">${L("Events", "رویدادها")}</a><a href="#/rewards">${L("Rewards", "جوایز")}</a><a href="admin.html">${L("Owner panel", "پنل مدیریت")}</a><a href="https://instagram.com/${BRAND.instagram}" target="_blank" rel="noopener">Instagram</a></div>
+    <div class="foot-links"><a href="#/menu">${L("Menu", "منو")}</a><a href="#/events">${L("Events", "رویدادها")}</a><a href="#/rewards">${L("Rewards", "جوایز")}</a><a href="admin.html">${L("Owner panel", "پنل مدیریت")}</a><a href="https://instagram.com/${BRAND.instagram}" target="_blank" rel="noopener">${L("Instagram", "اینستاگرام")}</a></div>
     <a class="alpha-sig" href="https://alphaa.agency" target="_blank" rel="noopener" aria-label="Powered by Alpha Agency" dir="ltr" lang="en">
       <span>Powered by Alpha Agency</span>
       <img class="sig-light" src="assets/brand/alpha-black.png" alt="Alpha Agency" width="56" height="43" loading="lazy">
       <img class="sig-dark" src="assets/brand/alpha-white.png" alt="Alpha Agency" width="56" height="43" loading="lazy">
     </a>
-    <p class="tiny">© ${digits(String(new Date().getFullYear()))} ${L("Coffee Conpanna · Tabriz · Esfahan", "کافه کن‌پانا · تبریز · اصفهان")}</p>
+    <p class="tiny">© ${digits(String(new Date().getFullYear()))} ${L("Coffee Conpanna – Tabriz – Esfahan", "کافه کن‌پانا – تبریز – اصفهان")}</p>
   </footer>`;
 
 export { tile };

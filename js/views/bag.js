@@ -43,25 +43,25 @@ export default function bag(el, r, { dock }) {
     const up = pairId && item(pairId);
     el.innerHTML = `
     <div class="wrap narrow page-top">
-      <div class="page-head"><div><h1 class="lt">${L("Your bag", "سبد شما")}</h1><p class="small">${s.user ? L(`+${t.points} points · +${t.drinks} stamps with this order`, `+${num(t.points)} امتیاز · +${num(t.drinks)} مهر با این سفارش`) : L("Sign in at checkout to collect points and stamps", "هنگام پرداخت وارد شوید تا امتیاز و مهر بگیرید")}</p></div></div>
+      <div class="page-head"><div><h1 class="lt">${L("Your bag", "سبد شما")}</h1><p class="small">${s.user ? L(`+${t.points} points – +${t.drinks} stamps with this order`, `+${num(t.points)} امتیاز – +${num(t.drinks)} مهر با این سفارش`) : L("Sign in at checkout to collect points and stamps", "هنگام پرداخت وارد شوید تا امتیاز و مهر بگیرید")}</p></div></div>
 
       <div class="mode-card">${seg([["delivery", L("Delivery", "ارسال"), "scooter"], ["takeaway", L("Takeaway", "بیرون‌بر"), "takeaway"]], s.mode, "big")}</div>
       ${paused ? `<div class="notice">${icon("pause")}<span>${L(`${b.name} has paused online orders for a few minutes. Choose another branch or try again soon.`, `شعبه‌ی ${b.name_fa} سفارش آنلاین را چند دقیقه متوقف کرده است. شعبه‌ی دیگری انتخاب کنید یا کمی بعد امتحان کنید.`)}</span></div>` : ""}
 
       <p class="group-label">${s.mode === "delivery" ? L("Deliver from", "ارسال از") : L("Pick up at", "تحویل در")}</p>
       <div class="group">
-        <button class="row" type="button" id="b-branch"><span class="row-ic soft">${icon("pin")}</span><span class="row-main"><span class="row-t">${L("Conpanna", "کن‌پانا")} ${esc(loc(b))}</span><span class="row-s">${esc(loc(b, "city"))} · ${openState(b).label}</span></span>${icon("chev", "chev")}</button>
+        <button class="row" type="button" id="b-branch"><span class="row-ic soft">${icon("pin")}</span><span class="row-main"><span class="row-t">${L("Conpanna", "کن‌پانا")} ${esc(loc(b))}</span><span class="row-s">${esc(loc(b, "city"))} – ${openState(b).label}</span></span>${icon("chev", "chev")}</button>
         ${s.mode === "delivery" ? `
         <button class="row" type="button" id="b-addr"><span class="row-ic soft">${icon("home")}</span><span class="row-main"><span class="row-t">${addr ? esc(addr.label) : L("Add a delivery address", "افزودن آدرس تحویل")}</span><span class="row-s">${addr ? esc(addr.line) : L("Where should the courier go?", "پیک کجا بیاید؟")}</span></span>${icon("chev", "chev")}</button>
         <div class="row"><span class="row-ic soft">${icon("clock")}</span><span class="row-main"><span class="row-t">${L(`Arrives in ${DELIVERY.eta} min`, `رسیدن در ${digits(DELIVERY.eta)} دقیقه`)}</span><span class="row-s">${tier.id === "gold" ? L("Free delivery — Gold Panna", "ارسال رایگان — پانا طلایی") : t.fee ? L(`Free delivery over ${num(DELIVERY.freeOver)} T`, `ارسال رایگان برای خرید بالای ${num(DELIVERY.freeOver)} تومان`) : L("Delivery is on us", "ارسال مهمان ما")}</span></span></div>` : `
-        <div class="row col"><span class="row-main flexline"><span class="row-ic soft">${icon("clock")}</span><span><span class="row-t">${L("Pickup time", "زمان تحویل")}</span><span class="row-s">${here ? L(`You're checked in at ${branch(here.branch).name}${here.table ? ` · we'll bring it to table ${here.table}` : ""}`, `در ${branch(here.branch).name_fa} حضور دارید${here.table ? ` · سفارش را سر میز ${digits(here.table)} می‌آوریم` : ""}`) : L("We'll have it ready on the counter", "روی پیشخوان آماده‌اش می‌کنیم")}</span></span></span>
+        <div class="row col"><span class="row-main flexline"><span class="row-ic soft">${icon("clock")}</span><span><span class="row-t">${L("Pickup time", "زمان تحویل")}</span><span class="row-s">${here ? L(`You're checked in at ${branch(here.branch).name}${here.table ? ` – we'll bring it to table ${here.table}` : ""}`, `در ${branch(here.branch).name_fa} حضور دارید${here.table ? ` – سفارش را سر میز ${digits(here.table)} می‌آوریم` : ""}`) : L("We'll have it ready on the counter", "روی پیشخوان آماده‌اش می‌کنیم")}</span></span></span>
           <div class="slots" id="slots">${slots().map((x) => `<button class="slot" type="button" data-v="${x.v}" aria-pressed="${s.pickup === x.v}"><b>${x.t}</b><span>${x.s}</span></button>`).join("")}</div></div>`}
       </div>
 
       <p class="group-label">${L("Order", "سفارش")}</p>
       <div class="group">${s.bag.map((l) => { const it = item(l.id); return `
         <div class="bag-line">${tile(it)}
-          <div class="row-main" data-edit="${esc(l.key)}" role="button" tabindex="0"><div class="row-t">${esc(loc(it))}</div><div class="row-s">${esc(selLabel(it, l.sel) || L("As it comes", "پیش‌فرض"))} · <span class="link">${L("Edit", "ویرایش")}</span></div><div class="mi-p">${money(lineTotal(l))}</div></div>
+          <div class="row-main" data-edit="${esc(l.key)}" role="button" tabindex="0"><div class="row-t">${esc(loc(it))}</div><div class="row-s">${esc(selLabel(it, l.sel) || L("As it comes", "پیش‌فرض"))} – <span class="link">${L("Edit", "ویرایش")}</span></div><div class="mi-p">${money(lineTotal(l))}</div></div>
           <div class="stepper sm" role="group"><button type="button" data-k="${esc(l.key)}" data-d="-1" aria-label="−">${icon(l.qty === 1 ? "trash" : "minus")}</button><output>${num(l.qty)}</output><button type="button" data-k="${esc(l.key)}" data-d="1" aria-label="+">${icon("plus")}</button></div>
         </div>`; }).join("")}
         <a class="row" href="#/menu"><span class="row-ic" style="--c:var(--tint);color:var(--ink-2)">${icon("plus")}</span><span class="row-main"><span class="row-t link">${L("Add more", "افزودن موارد بیشتر")}</span></span></a>
@@ -71,11 +71,11 @@ export default function bag(el, r, { dock }) {
 
       <p class="group-label">${L("Rewards", "جوایز")}</p>
       <div class="group">
-        ${s.rewards > 0 ? `<label class="row reward-row"><span class="row-ic" style="--c:var(--primary)">${icon("gift")}</span><span class="row-main"><span class="row-t">${L("Use a free drink", "استفاده از نوشیدنی رایگان")}</span><span class="row-s">${L(`${s.rewards} on your stamp card`, `${num(s.rewards)} عدد روی کارت مهر`)}${t.drinks ? "" : L(" · add a drink to use it", " · برای استفاده یک نوشیدنی اضافه کنید")}</span></span><span class="switch"><input type="checkbox" id="redeem" ${s.redeem ? "checked" : ""} ${t.drinks ? "" : "disabled"}><span class="sw-track"><span class="sw-knob"></span></span></span></label>` : ""}
-        <button class="row" type="button" id="b-voucher"><span class="row-ic" style="--c:#B4682F">${icon("tag")}</span><span class="row-main"><span class="row-t">${v ? esc(loc(voucherMeta(v), "title")) : L("Vouchers", "کوپن‌ها")}</span><span class="row-s">${v ? L(`Applied · −${num(t.voucher)} T`, `اعمال شد · −${num(t.voucher)} تومان`) : vs.length ? L(`${vs.length} available`, `${num(vs.length)} کوپن قابل استفاده`) : L("None yet — sign in for 20% off your first order", "هنوز ندارید؛ با ورود، ٪۲۰ تخفیف اولین سفارش")}</span></span>${icon("chev", "chev")}</button>
-        <div class="promo"><input id="promo" placeholder="${L("Promo code", "کد تخفیف")}" value="${esc(s.promo || "")}" autocomplete="off" aria-label="${L("Promo code", "کد تخفیف")}" dir="ltr"><button class="btn btn--sm ${s.promo ? "btn--soft" : ""}" type="button" id="apply">${s.promo ? L("Remove", "حذف") : L("Apply", "اعمال")}</button></div>
+        ${s.rewards > 0 ? `<label class="row reward-row"><span class="row-ic" style="--c:var(--primary)">${icon("gift")}</span><span class="row-main"><span class="row-t">${L("Use a free drink", "استفاده از نوشیدنی رایگان")}</span><span class="row-s">${L(`${s.rewards} on your stamp card`, `${num(s.rewards)} عدد روی کارت مهر`)}${t.drinks ? "" : L(" – add a drink to use it", " – برای استفاده یک نوشیدنی اضافه کنید")}</span></span><span class="switch"><input type="checkbox" id="redeem" ${s.redeem ? "checked" : ""} ${t.drinks ? "" : "disabled"}><span class="sw-track"><span class="sw-knob"></span></span></span></label>` : ""}
+        <button class="row" type="button" id="b-voucher"><span class="row-ic" style="--c:#B4682F">${icon("tag")}</span><span class="row-main"><span class="row-t">${v ? esc(loc(voucherMeta(v), "title")) : L("Vouchers", "کوپن‌ها")}</span><span class="row-s">${v ? L(`Applied – −${num(t.voucher)} T`, `اعمال شد – −${num(t.voucher)} تومان`) : vs.length ? L(`${vs.length} available`, `${num(vs.length)} کوپن قابل استفاده`) : L("None yet — sign in for 20% off your first order", "هنوز ندارید؛ با ورود، ٪۲۰ تخفیف اولین سفارش")}</span></span>${icon("chev", "chev")}</button>
+        <div class="promo"><input id="promo" class="lat" dir="ltr" placeholder="${L("Promo code", "کد تخفیف")}" value="${esc(s.promo || "")}" autocomplete="off" aria-label="${L("Promo code", "کد تخفیف")}" dir="ltr"><button class="btn btn--sm ${s.promo ? "btn--soft" : ""}" type="button" id="apply">${s.promo ? L("Remove", "حذف") : L("Apply", "اعمال")}</button></div>
       </div>
-      <p class="group-foot">${L("Try <b>CONPANNA10</b> for 10% off.", "کد <b>CONPANNA10</b> را برای ٪۱۰ تخفیف امتحان کنید.")}</p>
+      <p class="group-foot">${L("Try <b>CONPANNA10</b> for 10% off.", "کد <b class=\"lat\">CONPANNA10</b> را برای ٪۱۰ تخفیف امتحان کنید.")}</p>
 
       <p class="group-label">${L("Payment", "پرداخت")}</p>
       <div class="group" role="radiogroup" aria-label="${L("Payment", "پرداخت")}">
@@ -90,14 +90,14 @@ export default function bag(el, r, { dock }) {
         <div><span>${L("Subtotal", "جمع")}</span>${money(t.subtotal)}</div>
         ${t.reward ? `<div class="neg"><span>${L("Free drink", "نوشیدنی رایگان")}</span><span>−${money(t.reward)}</span></div>` : ""}
         ${t.voucher ? `<div class="neg"><span>${L("Voucher", "کوپن")}</span><span>−${money(t.voucher)}</span></div>` : ""}
-        ${t.discount ? `<div class="neg"><span dir="ltr">${esc(s.promo)}</span><span>−${money(t.discount)}</span></div>` : ""}
+        ${t.discount ? `<div class="neg"><span><span class="lat">${esc(s.promo)}</span></span><span>−${money(t.discount)}</span></div>` : ""}
         ${t.tierOff ? `<div class="neg"><span>${L("Gold Panna 10%", "٪۱۰ پانا طلایی")}</span><span>−${money(t.tierOff)}</span></div>` : ""}
         ${s.mode === "delivery" ? `<div><span>${L("Delivery", "هزینه‌ی ارسال")}</span>${t.fee ? money(t.fee) : `<span class="neg">${L("Free", "رایگان")}</span>`}</div>` : ""}
         <div class="total"><span>${L("Total", "مبلغ نهایی")}</span>${money(t.total)}</div>
       </div></div>
     </div>`;
 
-    dock.innerHTML = `<div class="checkout"><div class="co-sum"><b>${money(t.total)}</b><span>${L(`${s.bag.reduce((n, l) => n + l.qty, 0)} items`, `${num(s.bag.reduce((n, l) => n + l.qty, 0))} قلم`)} · ${s.mode === "delivery" ? L("Delivery", "ارسال") : L("Takeaway", "بیرون‌بر")}</span></div><button class="btn" id="place" type="button" ${paused ? "disabled" : ""}>${s.pay === "online" ? L("Pay & order", "پرداخت و ثبت") : L("Place order", "ثبت سفارش")}</button></div>`;
+    dock.innerHTML = `<div class="checkout"><div class="co-sum"><b>${money(t.total)}</b><span>${L(`${s.bag.reduce((n, l) => n + l.qty, 0)} items`, `${num(s.bag.reduce((n, l) => n + l.qty, 0))} قلم`)} – ${s.mode === "delivery" ? L("Delivery", "ارسال") : L("Takeaway", "بیرون‌بر")}</span></div><button class="btn" id="place" type="button" ${paused ? "disabled" : ""}>${s.pay === "online" ? L("Pay & order", "پرداخت و ثبت") : L("Place order", "ثبت سفارش")}</button></div>`;
     wire();
   };
 
@@ -141,7 +141,7 @@ export default function bag(el, r, { dock }) {
     setTimeout(() => location.replace(`#/order/${order.id}`), 200);
     setTimeout(() => {
       if (challenge) { grantVoucher("challenge"); celebrate({ icon: "cake", title: L("Challenge complete!", "چالش انجام شد!"), body: L("Three Con Pannas tried. A free cake is waiting in your rewards.", "سه کن‌پانا را چشیدید. یک کیک رایگان در جوایزتان منتظر است."), cta: L("See rewards", "دیدن جوایز"), href: "#/rewards" }); }
-      else if (tierUp) celebrate({ icon: "crown", title: L(`Welcome to ${tierUp.name}`, `به سطح ${tierUp.name_fa} خوش آمدید`), body: L(tierUp.perks.join(" · "), tierUp.perks_fa.join(" · ")), cta: L("See your perks", "دیدن مزایا"), href: "#/rewards" });
+      else if (tierUp) celebrate({ icon: "crown", title: L(`Welcome to ${tierUp.name}`, `به سطح ${tierUp.name_fa} خوش آمدید`), body: L(tierUp.perks.join(" – "), tierUp.perks_fa.join(" – ")), cta: L("See your perks", "دیدن مزایا"), href: "#/rewards" });
       else if (fresh) toast(L("Stamp card full — a free drink is yours", "کارت مهر پر شد؛ یک نوشیدنی رایگان مال شماست"), "gift");
     }, 900);
   }
@@ -155,7 +155,7 @@ bag.meta = { title: ["Your bag", "سبد شما"], back: true, parent: "#/menu" 
 export function voucherSheet(done) {
   const s = get(), vs = activeVouchers();
   sheet(`<h2>${L("Vouchers", "کوپن‌ها")}</h2><p class="small lead">${L("One voucher per order. Stamp-card drinks and promo codes still stack.", "در هر سفارش یک کوپن. نوشیدنی کارت مهر و کد تخفیف همچنان قابل استفاده‌اند.")}</p>
-    ${vs.length ? `<div class="vlist" role="radiogroup">${vs.map((v) => { const m = voucherMeta(v); return `<button class="voucher" type="button" role="radio" aria-checked="${s.voucherId === v.id}" data-v="${v.id}"><span class="v-ic">${icon(m.kind === "pct" ? "tag" : m.kind === "cake" ? "cake" : "coffee")}</span><span class="row-main"><span class="row-t">${esc(loc(m, "title"))}</span><span class="row-s">${esc(loc(m, "sub"))} · ${L("until", "تا")} ${relDay(new Date(v.exp))}</span></span><span class="radio"></span></button>`; }).join("")}</div>
+    ${vs.length ? `<div class="vlist" role="radiogroup">${vs.map((v) => { const m = voucherMeta(v); return `<button class="voucher" type="button" role="radio" aria-checked="${s.voucherId === v.id}" data-v="${v.id}"><span class="v-ic">${icon(m.kind === "pct" ? "tag" : m.kind === "cake" ? "cake" : "coffee")}</span><span class="row-main"><span class="row-t">${esc(loc(m, "title"))}</span><span class="row-s">${esc(loc(m, "sub"))} – ${L("until", "تا")} ${relDay(new Date(v.exp))}</span></span><span class="radio"></span></button>`; }).join("")}</div>
       ${s.voucherId ? `<button class="btn btn--soft btn--block" id="v-none" type="button" style="margin-top:12px">${L("Don't use a voucher", "بدون کوپن")}</button>` : ""}`
     : `<div class="empty">${icon("tag")}<h3>${L("No vouchers yet", "هنوز کوپنی ندارید")}</h3><p class="small">${L("Sign in for 20% off your first order, invite a friend, or finish a challenge.", "با ورود ٪۲۰ تخفیف اولین سفارش، با دعوت دوستان یا انجام چالش کوپن بگیرید.")}</p></div>`}`,
   { label: L("Vouchers", "کوپن‌ها"), onMount(b) {
@@ -196,7 +196,7 @@ export function signInSheet() {
       <label class="field"><span>${L("Mobile number", "شماره‌ی موبایل")}</span><input id="ph" type="tel" inputmode="tel" placeholder="0912 345 6789" autocomplete="tel" maxlength="13" dir="ltr"></label>
       <label class="field"><span>${L("Your name", "نام شما")}</span><input id="nm" placeholder="${L("What should the barista call you?", "باریستا شما را چه صدا کند؟")}" autocomplete="given-name"></label>
       <label class="field"><span>${L("Birthday (optional) — for a drink on us", "تاریخ تولد (اختیاری) — برای نوشیدنی مهمان ما")}</span><input id="bd" type="date" dir="ltr"></label>
-      <label class="field"><span>${L("Invite code (optional)", "کد دعوت (اختیاری)")}</span><input id="rf" placeholder="SARA42" dir="ltr" autocapitalize="characters"></label>
+      <label class="field"><span>${L("Invite code (optional)", "کد دعوت (اختیاری)")}</span><input id="rf" class="lat" placeholder="SARA42" dir="ltr" autocapitalize="characters"></label>
       <button class="btn btn--block" id="send" type="button" style="margin-top:18px">${L("Send code", "ارسال کد")}</button></div>`,
     { label: L("Sign in", "ورود"), onMount(b) {
       setTimeout(() => $("#ph", b)?.focus(), 350);
@@ -207,7 +207,7 @@ export function signInSheet() {
         if (!nm) { toast(L("Add your name", "نام خود را وارد کنید"), "profile"); $("#nm", b).focus(); return; }
         code = String(Math.floor(1000 + Math.random() * 9000));
         import("../notify.js").then(({ notify }) => notify({ title: L("Coffee Conpanna", "کافه کن‌پانا"), body: L(`Your code is ${code}. It expires in 2 minutes.`, `کد شما ${digits(code)} است. تا ۲ دقیقه معتبر است.`), cat: "system" }));
-        toast(L(`Code sent · ${code}`, `کد ارسال شد · ${digits(code)}`), "phone");
+        toast(L(`Code sent – ${code}`, `کد ارسال شد – ${digits(code)}`), "phone");
         $("#si", b).innerHTML = `<h2>${L("Enter the code", "کد را وارد کنید")}</h2><p class="small lead">${L("Sent to", "ارسال شد به")} <span dir="ltr">${digits(ph.replace(/(\d{4})(\d{3})(\d{4})/, "$1 $2 $3"))}</span>. <span class="tiny">${L("(Preview: it's in the message above.)", "(در این نمونه، کد در پیام بالا است.)")}</span></p>
           <div class="otp" id="otp" dir="ltr">${[0, 1, 2, 3].map(() => `<input inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="digit">`).join("")}</div>`;
         const ins = $$("#otp input", b);

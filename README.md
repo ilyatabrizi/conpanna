@@ -4,7 +4,7 @@ An installable preview of a Coffee Conpanna app, built by Alpha Agency from Conp
 
 - Live app: https://ilyatabrizi.github.io/conpanna/
 - Owner panel: https://ilyatabrizi.github.io/conpanna/admin.html (demo PIN 1234)
-- Languages: Persian (RTL, IRANYekanX, Persian digits, Jalali dates) and English, switchable anywhere
+- Language: Persian (RTL, IRANYekanX, Persian digits, Jalali dates); the tab bar and Alpha signature stay English
 - Pages: Home · Menu · Check-in · Events · Profile, plus Bag, Order tracking, Orders, Rewards and Settings
 - Ordering: Delivery or Takeaway from the four branches (Tabriz Valiasr, ElahiParast, Aseman, Esfahan), options, "goes well with" pairings, vouchers, promo codes, stamp rewards, preview payment, live tracking
 - Club (CRM): Crema / Panna / Gold Panna tiers, points, stamp card, vouchers (welcome, birthday, referral, campaign), invite codes, monthly challenge, gift a coffee, "your usual"

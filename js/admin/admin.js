@@ -148,18 +148,18 @@ function overview() {
       <div class="kpi"><span>${L("Revenue today", "فروش امروز")}</span><b>${kmoney(rev)}<small> ${L("T", "تومان")}</small></b>${delta(rev, revY)}<em>${L("vs same time yesterday", "نسبت به همین ساعت دیروز")}</em></div>
       <div class="kpi"><span>${L("Orders", "سفارش‌ها")}</span><b>${num(ord)}</b>${delta(ord, ordY)}<em>${L(`${live.length} in progress now`, `${num(live.length)} سفارش در جریان`)}</em></div>
       <div class="kpi"><span>${L("Average ticket", "میانگین سفارش")}</span><b>${kk(avg)}<small> ${L("T", "تومان")}</small></b>${delta(avg, avgY)}<em>${L("per order", "به ازای هر سفارش")}</em></div>
-      <div class="kpi"><span>${L("New members · 7 days", "عضو جدید · ۷ روز")}</span><b>${num(newM)}</b><em>${L(`${num(seg.list.length)} members in total`, `${num(seg.list.length)} عضو در مجموع`)}</em></div>
+      <div class="kpi"><span>${L("New members – 7 days", "عضو جدید – ۷ روز")}</span><b>${num(newM)}</b><em>${L(`${num(seg.list.length)} members in total`, `${num(seg.list.length)} عضو در مجموع`)}</em></div>
       <div class="kpi"><span>${L("Rating", "امتیاز مشتریان")}</span><b>${digits(rating.toFixed(1))}<small> / ${digits(5)}</small></b><em>${L(`${num(rated.length)} ratings`, `${num(rated.length)} امتیاز`)}</em></div>
     </div>
     <div class="cards g2">
-      <section class="card wide"><div class="card-h"><h3>${L("Revenue · 14 days", "فروش · ۱۴ روز")}</h3><span class="tiny">${L("Toman", "تومان")} · ${kmoney(sum(all.filter((o) => o.at > t0 - 13 * DAY)))}</span></div>${areaChart(revDays, days.map((d) => digits(new Intl.DateTimeFormat(getLang() === "fa" ? "fa-IR-u-ca-persian" : "en-GB", { day: "numeric" }).format(d))))}</section>
+      <section class="card wide"><div class="card-h"><h3>${L("Revenue – 14 days", "فروش – ۱۴ روز")}</h3><span class="tiny">${L("Toman", "تومان")} – ${kmoney(sum(all.filter((o) => o.at > t0 - 13 * DAY)))}</span></div>${areaChart(revDays, days.map((d) => digits(new Intl.DateTimeFormat(getLang() === "fa" ? "fa-IR-u-ca-persian" : "en-GB", { day: "numeric" }).format(d))))}</section>
       <section class="card"><div class="card-h"><h3>${L("Orders by hour", "سفارش در ساعت‌های روز")}</h3><span class="tiny legend"><i class="lg-t"></i>${L("Today", "امروز")} <i class="lg-a"></i>${L("7-day avg", "میانگین ۷ روز")}</span></div>${hourBars(hoursT, hoursA)}</section>
-      <section class="card"><div class="card-h"><h3>${L("How they order · 7 days", "نحوه‌ی سفارش · ۷ روز")}</h3></div>${donut([{ l: L("Takeaway", "بیرون‌بر"), v: mix.takeaway, c: "#45281A" }, { l: L("Delivery", "ارسال"), v: mix.delivery, c: "#C9A57C" }, { l: L("Dine-in", "سالن"), v: mix.dinein, c: "#8A5634" }])}</section>
-      <section class="card"><div class="card-h"><h3>${L("Best sellers · 7 days", "پرفروش‌ها · ۷ روز")}</h3></div>${bars(top.map(([id, v]) => ({ l: esc(loc(item(id))), v })))}</section>
+      <section class="card"><div class="card-h"><h3>${L("How they order – 7 days", "نحوه‌ی سفارش – ۷ روز")}</h3></div>${donut([{ l: L("Takeaway", "بیرون‌بر"), v: mix.takeaway, c: "#45281A" }, { l: L("Delivery", "ارسال"), v: mix.delivery, c: "#C9A57C" }, { l: L("Dine-in", "سالن"), v: mix.dinein, c: "#8A5634" }])}</section>
+      <section class="card"><div class="card-h"><h3>${L("Best sellers – 7 days", "پرفروش‌ها – ۷ روز")}</h3></div>${bars(top.map(([id, v]) => ({ l: esc(loc(item(id))), v })))}</section>
       <section class="card"><div class="card-h"><h3>${L("Branches today", "شعبه‌ها امروز")}</h3></div>${bars(brRev, {})}</section>
     </div>
     <section class="card"><div class="card-h"><h3>${L("Happening now", "همین حالا")}</h3><button class="btn btn--sm btn--soft" data-go="orders">${L("Open board", "باز کردن بورد")}</button></div>
-      <div class="feed">${live.slice(-5).reverse().map((o) => `<div class="feed-i"><span class="st st-${o.status}"></span><b>#${digits(o.code)}</b><span>${esc(o.name)} · ${esc(loc(branch(o.branch)))}</span><span class="tiny">${ago(o.at)}</span></div>`).join("") || `<p class="small">${L("No orders in progress.", "سفارشی در جریان نیست.")}</p>`}</div></section>
+      <div class="feed">${live.slice(-5).reverse().map((o) => `<div class="feed-i"><span class="st st-${o.status}"></span><b>#${digits(o.code)}</b><span>${esc(o.name)} – ${esc(loc(branch(o.branch)))}</span><span class="tiny">${ago(o.at)}</span></div>`).join("") || `<p class="small">${L("No orders in progress.", "سفارشی در جریان نیست.")}</p>`}</div></section>
     <p class="tiny demo-note">${L("Demo data for the preview, plus everything done in the customer app on this device.", "داده‌ی نمونه برای پیش‌نمایش، به‌علاوه‌ی هر کاری که در اپ مشتری روی همین دستگاه انجام شود.")}</p>`;
 }
 
@@ -170,9 +170,9 @@ function orders() {
     const late = o.status !== "done" && Date.now() - o.at > 15 * 60e3;
     const next = { new: L("Accept", "پذیرش"), brewing: o.mode === "delivery" ? L("Send out", "ارسال شد") : L("Ready", "آماده شد"), ready: o.mode === "delivery" ? L("Delivered", "تحویل شد") : L("Collected", "تحویل گرفت") }[o.status];
     return `<article class="oc ${o.src === "app" ? "from-app" : ""} ${late ? "late" : ""}" data-id="${o.id}">
-      <header><b>#${digits(o.code)}</b><span class="oc-mode">${icon(o.mode === "delivery" ? "scooter" : o.mode === "dinein" ? "table" : "takeaway")}${o.mode === "delivery" ? L("Delivery", "ارسال") : o.mode === "dinein" ? L("Table", "میز") + (o.table ? " " + digits(o.table) : "") : L("Takeaway", "بیرون‌بر")}${o.table && o.mode !== "dinein" ? ` · ${L("table", "میز")} ${digits(o.table)}` : ""}</span><span class="tiny">${ago(o.at)}</span></header>
-      <div class="oc-who">${esc(o.name)}${o.src === "app" ? `<span class="app-pill">${L("from the app", "از اپ")}</span>` : ""} · <span class="tiny">${esc(loc(branch(o.branch)))}</span></div>
-      <ul>${o.lines.map((l) => `<li><b>${num(l.qty)}×</b> ${esc(loc(item(l.id)) || l.name)}${l.opts ? `<span class="tiny"> · ${esc(l.opts)}</span>` : ""}</li>`).join("")}</ul>
+      <header><b>#${digits(o.code)}</b><span class="oc-mode">${icon(o.mode === "delivery" ? "scooter" : o.mode === "dinein" ? "table" : "takeaway")}${o.mode === "delivery" ? L("Delivery", "ارسال") : o.mode === "dinein" ? L("Table", "میز") + (o.table ? " " + digits(o.table) : "") : L("Takeaway", "بیرون‌بر")}${o.table && o.mode !== "dinein" ? ` – ${L("table", "میز")} ${digits(o.table)}` : ""}</span><span class="tiny">${ago(o.at)}</span></header>
+      <div class="oc-who">${esc(o.name)}${o.src === "app" ? `<span class="app-pill">${L("from the app", "از اپ")}</span>` : ""} – <span class="tiny">${esc(loc(branch(o.branch)))}</span></div>
+      <ul>${o.lines.map((l) => `<li><b>${num(l.qty)}×</b> ${esc(loc(item(l.id)) || l.name)}${l.opts ? `<span class="tiny"> – ${esc(l.opts)}</span>` : ""}</li>`).join("")}</ul>
       ${o.note ? `<p class="oc-note">${icon("note")}${esc(o.note)}</p>` : ""}
       <footer>${money(o.total)}${next ? `<button class="btn btn--sm" data-adv="${o.id}">${next}${icon("chev", "chev")}</button>` : `<span class="tiny">${icon("check")}</span>`}</footer>
     </article>`;
@@ -194,7 +194,7 @@ function menuSec() {
   const sold = {}; allOrders().filter((o) => o.at >= t0).forEach((o) => o.lines.forEach((l) => { sold[l.id] = (sold[l.id] || 0) + l.qty; }));
   return `<p class="small sec-lead">${L("Switch an item off and it shows as sold out in the app straight away. Edit a price and the app updates.", "هر آیتمی را خاموش کنید، فوراً در اپ «تمام شد» نشان داده می‌شود. قیمت را تغییر دهید تا اپ هم به‌روز شود.")}</p>
     ${CATEGORIES.map((c) => `<section class="card"><div class="card-h"><h3>${esc(loc(c))}</h3></div><div class="mlist">${MENU.filter((m) => m.cat === c.id).map((m) => `
-      <div class="mrow ${hub.soldOut.includes(m.id) ? "off" : ""}">${tile(m, "sm")}<span class="row-main"><span class="row-t">${esc(loc(m))}</span><span class="row-s">${L(`${num(sold[m.id] || 0)} sold today`, `${num(sold[m.id] || 0)} فروش امروز`)}${hub.prices[m.id] != null ? ` · <span class="link">${L("price edited", "قیمت تغییر کرده")}</span>` : ""}</span></span>
+      <div class="mrow ${hub.soldOut.includes(m.id) ? "off" : ""}">${tile(m, "sm")}<span class="row-main"><span class="row-t">${esc(loc(m))}</span><span class="row-s">${L(`${num(sold[m.id] || 0)} sold today`, `${num(sold[m.id] || 0)} فروش امروز`)}${hub.prices[m.id] != null ? ` – <span class="link">${L("price edited", "قیمت تغییر کرده")}</span>` : ""}</span></span>
         <label class="price-in"><input type="text" inputmode="numeric" data-price="${m.id}" value="${num(hub.prices[m.id] ?? m.price)}" aria-label="${L("Price", "قیمت")}"><small>${L("T", "تومان")}</small></label>
         <label class="avail">${sw("av-" + m.id, !hub.soldOut.includes(m.id), "")}<span class="tiny">${hub.soldOut.includes(m.id) ? L("Sold out", "تمام شد") : L("Available", "موجود")}</span></label>
       </div>`).join("")}</div></section>`).join("")}`;
@@ -209,10 +209,10 @@ function customers() {
   return `
     <div class="seg-chips">${keys.map((k) => `<button class="chip" data-cseg="${k}" aria-pressed="${cseg === k}">${seg[k].n}<span class="n">${num(seg.list.filter(seg[k].f).length)}</span></button>`).join("")}</div>
     <div class="cbar"><div class="search"><span>${icon("search")}</span><input id="cq" type="search" value="${esc(cq)}" placeholder="${L("Name or phone", "نام یا شماره")}"></div><button class="btn btn--sm btn--soft" id="csv">${icon("dl")}${L("Export CSV", "خروجی CSV")}</button><button class="btn btn--sm" data-go="campaigns">${icon("mega")}${L("Message this group", "پیام به این گروه")}</button></div>
-    ${me ? `<button class="crow me-row" data-cust="APP"><span class="cav">${esc(me.name[0])}</span><span class="row-main"><span class="row-t">${esc(me.name)} <span class="app-pill">${L("this phone · live", "همین گوشی · زنده")}</span></span><span class="row-s" dir="ltr">${digits(me.phone)}</span></span><span class="c-num">${num(appState().orders.length)}<small>${L("orders", "سفارش")}</small></span><span class="c-num">${num(appState().points)}<small>${L("points", "امتیاز")}</small></span>${icon("chev", "chev")}</button>` : ""}
+    ${me ? `<button class="crow me-row" data-cust="APP"><span class="cav">${esc(me.name[0])}</span><span class="row-main"><span class="row-t">${esc(me.name)} <span class="app-pill">${L("this phone – live", "همین گوشی – زنده")}</span></span><span class="row-s" dir="ltr">${digits(me.phone)}</span></span><span class="c-num">${num(appState().orders.length)}<small>${L("orders", "سفارش")}</small></span><span class="c-num">${num(appState().points)}<small>${L("points", "امتیاز")}</small></span>${icon("chev", "chev")}</button>` : ""}
     <div class="clist">${rows.slice(0, 60).map((c) => { const t = seg.tierOf(c.points); const days = Math.floor((Date.now() - c.last) / DAY); return `
       <button class="crow" data-cust="${c.id}"><span class="cav" style="--tier:${t.color}">${esc(loc(c)[0])}</span>
-        <span class="row-main"><span class="row-t">${esc(loc(c))} <span class="tier-pill" style="--tier:${t.color}">${esc(loc(t))}</span></span><span class="row-s">${esc(loc(branch(c.branch)))} · ${L("last visit", "آخرین بازدید")} ${days ? L(`${days} d ago`, `${num(days)} روز پیش`) : L("today", "امروز")}${(A.tags[c.id] || c.tags).map((tg) => ` · <span class="ctag">${esc(Array.isArray(tg) ? L(tg[0], tg[1]) : tg)}</span>`).join("")}</span></span>
+        <span class="row-main"><span class="row-t">${esc(loc(c))} <span class="tier-pill" style="--tier:${t.color}">${esc(loc(t))}</span></span><span class="row-s">${esc(loc(branch(c.branch)))} – ${L("last visit", "آخرین بازدید")} ${days ? L(`${days} d ago`, `${num(days)} روز پیش`) : L("today", "امروز")}${(A.tags[c.id] || c.tags).map((tg) => ` – <span class="ctag">${esc(Array.isArray(tg) ? L(tg[0], tg[1]) : tg)}</span>`).join("")}</span></span>
         <span class="c-num cv">${num(c.visits)}<small>${L("visits", "بازدید")}</small></span><span class="c-num">${kmoney(c.spend)}<small>${L("spent", "خرید")}</small></span>${icon("chev", "chev")}</button>`; }).join("")}</div>
     ${rows.length > 60 ? `<p class="tiny demo-note">${L(`Showing 60 of ${rows.length}`, `نمایش ۶۰ از ${num(rows.length)}`)}</p>` : ""}`;
 }
@@ -240,15 +240,15 @@ function customerSheet(id) {
   const hist = S.orders.filter((o) => o.customer === id).slice(-6).reverse();
   const favs = {}; S.orders.filter((o) => o.customer === id).forEach((o) => o.lines.forEach((l) => { favs[l.id] = (favs[l.id] || 0) + l.qty; }));
   const favTop = Object.entries(favs).sort((a, b) => b[1] - a[1]).slice(0, 3);
-  sheet(`<div class="cs-head"><span class="cav lg" style="--tier:${t.color}">${esc(loc(c)[0])}</span><div><h2>${esc(loc(c))}</h2><p class="small"><span dir="ltr">${digits(c.phone)}</span> · <span class="tier-pill" style="--tier:${t.color}">${esc(loc(t))}</span></p></div></div>
+  sheet(`<div class="cs-head"><span class="cav lg" style="--tier:${t.color}">${esc(loc(c)[0])}</span><div><h2>${esc(loc(c))}</h2><p class="small"><span dir="ltr">${digits(c.phone)}</span> – <span class="tier-pill" style="--tier:${t.color}">${esc(loc(t))}</span></p></div></div>
     <div class="kpis sm"><div class="kpi"><span>${L("Visits", "بازدید")}</span><b>${num(c.visits)}</b></div><div class="kpi"><span>${L("Spent", "خرید")}</span><b>${kmoney(c.spend)}</b></div><div class="kpi"><span>${L("Points", "امتیاز")}</span><b>${num(c.points)}</b></div><div class="kpi"><span>${L("Invited", "دعوت")}</span><b>${num(c.referrals)}</b></div></div>
     <div class="group" style="margin-top:14px">
-      <div class="row"><span class="row-ic soft">${icon("heart")}</span><span class="row-main"><span class="row-t">${L("Usually orders", "معمولاً سفارش می‌دهد")}</span><span class="row-s">${favTop.map(([i]) => esc(loc(item(i)))).join(" · ") || esc(loc(item(c.fav)))}</span></span></div>
-      <div class="row"><span class="row-ic soft">${icon("pin")}</span><span class="row-main"><span class="row-t">${L("Home branch", "شعبه‌ی اصلی")}</span><span class="row-s">${esc(loc(branch(c.branch)))} · ${L("member since", "عضو از")} ${fmtDay(new Date(c.joined))}</span></span></div>
+      <div class="row"><span class="row-ic soft">${icon("heart")}</span><span class="row-main"><span class="row-t">${L("Usually orders", "معمولاً سفارش می‌دهد")}</span><span class="row-s">${favTop.map(([i]) => esc(loc(item(i)))).join(" – ") || esc(loc(item(c.fav)))}</span></span></div>
+      <div class="row"><span class="row-ic soft">${icon("pin")}</span><span class="row-main"><span class="row-t">${L("Home branch", "شعبه‌ی اصلی")}</span><span class="row-s">${esc(loc(branch(c.branch)))} – ${L("member since", "عضو از")} ${fmtDay(new Date(c.joined))}</span></span></div>
       <div class="row"><span class="row-ic soft">${icon("cake")}</span><span class="row-main"><span class="row-t">${L("Birthday month", "ماه تولد")}</span><span class="row-s">${new Intl.DateTimeFormat(getLang() === "fa" ? "fa-IR" : "en-GB", { month: "long" }).format(new Date(2026, c.bmonth, 15))}</span></span></div>
     </div>
     <p class="group-label">${L("Recent orders", "سفارش‌های اخیر")}</p>
-    <div class="group">${hist.map((o) => `<div class="row plain"><span class="row-main"><span class="row-t">${o.lines.map((l) => esc(loc(item(l.id)))).join("، ")}</span><span class="row-s">${fmtDay(new Date(o.at))} · ${esc(loc(branch(o.branch)))}</span></span><span class="row-v">${money(o.total)}</span></div>`).join("") || `<div class="row plain"><span class="row-s">${L("No orders in the last two weeks", "در دو هفته‌ی اخیر سفارشی نداشته")}</span></div>`}</div>
+    <div class="group">${hist.map((o) => `<div class="row plain"><span class="row-main"><span class="row-t">${o.lines.map((l) => esc(loc(item(l.id)))).join("، ")}</span><span class="row-s">${fmtDay(new Date(o.at))} – ${esc(loc(branch(o.branch)))}</span></span><span class="row-v">${money(o.total)}</span></div>`).join("") || `<div class="row plain"><span class="row-s">${L("No orders in the last two weeks", "در دو هفته‌ی اخیر سفارشی نداشته")}</span></div>`}</div>
     <p class="group-label">${L("Note for the team", "یادداشت برای تیم")}</p>
     <textarea class="note-in" id="cnote" rows="2" placeholder="${L("e.g. allergic to nuts, likes window seat", "مثلاً به آجیل حساسیت دارد، میز کنار پنجره را دوست دارد")}">${esc(A.notes[id] || "")}</textarea>
     <div class="act-grid" style="margin-top:14px"><button class="btn btn--soft" data-a="voucher">${icon("tag")}${L("Send voucher", "ارسال کوپن")}</button><button class="btn btn--soft" data-a="stamps">${icon("coffee")}${L("Gift stamps", "هدیه‌ی مهر")}</button><button class="btn btn--soft" data-a="msg">${icon("send")}${L("Message", "پیام")}</button></div>`,
@@ -272,7 +272,7 @@ function campaigns() {
     <section class="card"><div class="card-h"><h3>${L("New campaign", "کمپین جدید")}</h3></div>
       <p class="group-label" style="margin-top:0">${L("Start from", "شروع از الگو")}</p>
       <div class="tpls">${TEMPLATES.map((t, i) => `<button class="chip" data-tpl="${i}">${esc(L(t.t, t.t_fa))}</button>`).join("")}</div>
-      <label class="field"><span>${L("Audience", "مخاطبان")}</span><select id="c-seg">${keys.map((k) => `<option value="${k}">${seg[k].n} · ${num(seg.list.filter(seg[k].f).length)}</option>`).join("")}</select></label>
+      <label class="field"><span>${L("Audience", "مخاطبان")}</span><select id="c-seg">${keys.map((k) => `<option value="${k}">${seg[k].n} – ${num(seg.list.filter(seg[k].f).length)}</option>`).join("")}</select></label>
       <label class="field"><span>${L("Channel", "کانال")}</span></label>${seg ? `<div class="seg" id="c-ch" role="group"><span class="seg-thumb"></span><button type="button" data-v="push" aria-pressed="true">${icon("bell")}<span>${L("Push", "اعلان")}</span></button><button type="button" data-v="sms" aria-pressed="false">${icon("phone")}<span>${L("SMS", "پیامک")}</span></button></div>` : ""}
       <label class="field"><span>${L("Title", "عنوان")}</span><input id="c-t" maxlength="60" value=""></label>
       <label class="field"><span>${L("Message", "متن پیام")}</span><textarea id="c-b" rows="3" maxlength="160"></textarea></label>
@@ -285,7 +285,7 @@ function campaigns() {
       <div class="phone"><div class="ph-time" dir="ltr">${fmtTime(new Date())}</div><div class="ph-note"><span class="ph-ic">${MARK}</span><div><b id="pv-t">${L("Your title", "عنوان شما")}</b><p id="pv-b">${L("Your message appears here.", "متن پیام اینجا نمایش داده می‌شود.")}</p></div><span class="tiny">${L("now", "اکنون")}</span></div></div>
     </section></div>
     <section class="card"><div class="card-h"><h3>${L("Sent campaigns", "کمپین‌های ارسال‌شده")}</h3></div>
-      ${A.campaigns.length ? `<div class="ctable">${A.campaigns.slice().reverse().map((c) => `<div class="ct-row"><span class="row-main"><span class="row-t">${esc(c.title)}</span><span class="row-s">${esc(c.segN)} · ${c.ch === "sms" ? L("SMS", "پیامک") : L("Push", "اعلان")} · ${fmtDay(new Date(c.at))} ${fmtTime(new Date(c.at))}${c.when !== "now" ? ` · ${L("scheduled", "زمان‌بندی‌شده")}` : ""}</span></span><span class="c-num">${num(c.reach)}<small>${L("reached", "دریافت")}</small></span><span class="c-num">${pct(c.open)}<small>${L("opened", "باز شده")}</small></span><span class="c-num">${num(c.redeem)}<small>${L("redeemed", "استفاده")}</small></span></div>`).join("")}</div><p class="tiny demo-note">${L("Open and redemption figures are simulated in the preview.", "آمار بازشدن و استفاده در این نمونه شبیه‌سازی شده است.")}</p>`
+      ${A.campaigns.length ? `<div class="ctable">${A.campaigns.slice().reverse().map((c) => `<div class="ct-row"><span class="row-main"><span class="row-t">${esc(c.title)}</span><span class="row-s">${esc(c.segN)} – ${c.ch === "sms" ? L("SMS", "پیامک") : L("Push", "اعلان")} – ${fmtDay(new Date(c.at))} ${fmtTime(new Date(c.at))}${c.when !== "now" ? ` – ${L("scheduled", "زمان‌بندی‌شده")}` : ""}</span></span><span class="c-num">${num(c.reach)}<small>${L("reached", "دریافت")}</small></span><span class="c-num">${pct(c.open)}<small>${L("opened", "باز شده")}</small></span><span class="c-num">${num(c.redeem)}<small>${L("redeemed", "استفاده")}</small></span></div>`).join("")}</div><p class="tiny demo-note">${L("Open and redemption figures are simulated in the preview.", "آمار بازشدن و استفاده در این نمونه شبیه‌سازی شده است.")}</p>`
       : `<p class="small">${L("Nothing sent yet. Try a template above.", "هنوز چیزی ارسال نشده. یکی از الگوها را امتحان کنید.")}</p>`}
     </section>`;
 }
@@ -322,7 +322,7 @@ function automations() {
     ["stamp", "coffee", L("One stamp to go", "یک مهر تا جایزه"), L("7 of 8 stamps → nudge with a reminder", "۷ مهر از ۸ ← یادآوری کوتاه"), 39, 47],
   ];
   return `<p class="small sec-lead">${L("Messages that send themselves at the right moment. Switch any of them off.", "پیام‌هایی که در لحظه‌ی درست خودشان ارسال می‌شوند. هرکدام را می‌توانید خاموش کنید.")}</p>
-    <div class="cards g3">${J.map(([k, ic, t, d, sent, conv]) => `<section class="card auto ${j[k] ? "" : "off"}"><div class="auto-h"><span class="row-ic" style="--c:var(--primary)">${icon(ic)}</span><b>${t}</b>${sw("j-" + k, j[k], t)}</div><p class="small">${d}</p><div class="auto-s"><span><b>${num(sent)}</b>${L("sent · 30 days", "ارسال · ۳۰ روز")}</span><span><b>${pct(conv)}</b>${L("came back", "برگشتند")}</span></div></section>`).join("")}</div>
+    <div class="cards g3">${J.map(([k, ic, t, d, sent, conv]) => `<section class="card auto ${j[k] ? "" : "off"}"><div class="auto-h"><span class="row-ic" style="--c:var(--primary)">${icon(ic)}</span><b>${t}</b>${sw("j-" + k, j[k], t)}</div><p class="small">${d}</p><div class="auto-s"><span><b>${num(sent)}</b>${L("sent – 30 days", "ارسال – ۳۰ روز")}</span><span><b>${pct(conv)}</b>${L("came back", "برگشتند")}</span></div></section>`).join("")}</div>
     <p class="tiny demo-note">${L("Figures are illustrative in the preview. The welcome journey really runs: join in the app and the voucher appears.", "آمار در این نمونه نمایشی است. مسیر خوش‌آمد واقعاً کار می‌کند: در اپ عضو شوید تا کوپن ظاهر شود.")}</p>`;
 }
 
@@ -333,37 +333,37 @@ function loyalty() {
     <section class="card"><div class="card-h"><h3>${L("Stamp card", "کارت مهر")}</h3></div>
       <p class="small">${L("How many drinks before one is free. Changes reach the app instantly.", "چند نوشیدنی تا یکی رایگان شود. تغییر فوراً به اپ می‌رسد.")}</p>
       <div style="margin-top:14px">${seg ? `<div class="seg big" id="stampseg"><span class="seg-thumb"></span>${[6, 8, 10].map((n) => `<button type="button" data-v="${n}" aria-pressed="${hub.loyalty.stamps === n}"><span>${L(`${n} stamps`, `${num(n)} مهر`)}</span></button>`).join("")}</div>` : ""}</div>
-      <div class="group" style="margin-top:16px"><div class="row plain"><span class="row-main"><span class="row-t">${L("Points", "امتیاز")}</span><span class="row-s">${L("1 per 10,000 T · 15 per check-in · 100 per referral", "هر ۱۰ هزار تومان ۱ · هر ورود ۱۵ · هر دعوت ۱۰۰")}</span></span></div></div>
+      <div class="group" style="margin-top:16px"><div class="row plain"><span class="row-main"><span class="row-t">${L("Points", "امتیاز")}</span><span class="row-s">${L("1 per 10,000 T – 15 per check-in – 100 per referral", "هر ۱۰ هزار تومان ۱ – هر ورود ۱۵ – هر دعوت ۱۰۰")}</span></span></div></div>
     </section>
     <section class="card"><div class="card-h"><h3>${L("Members by tier", "اعضا بر اساس سطح")}</h3></div>${bars(dist)}
-      <div class="tiers mini">${TIERS.map((t) => `<div class="tier" style="--tier:${t.color}"><div class="tier-top"><span class="tier-dot"></span><b>${esc(loc(t))}</b><span class="tiny">${t.min ? L(`${num(t.min)}+ pts`, `${num(t.min)}+ امتیاز`) : L("Start", "شروع")}</span></div><ul>${L(t.perks, t.perks_fa).slice(0, 3).map((p) => `<li>${icon("check")}${esc(p)}</li>`).join("")}</ul></div>`).join("")}</div>
+      <div class="tiers mini">${TIERS.map((t) => `<div class="tier" style="--tier:${t.color}"><div class="tier-top"><span class="tier-dot"></span><b>${esc(loc(t))}</b><span class="tiny">${t.min ? L(`${num(t.min)}+ pts`, `از ${num(t.min)} امتیاز`) : L("Start", "شروع")}</span></div><ul>${L(t.perks, t.perks_fa).slice(0, 3).map((p) => `<li>${icon("check")}${esc(p)}</li>`).join("")}</ul></div>`).join("")}</div>
     </section></div>`;
 }
 
 function eventsSec() {
   const tix = appState().tickets;
   return `<div class="cards g2">${EVENTS.map((e) => { const mine = tix.filter((t) => t.event === e.id).reduce((s, t) => s + t.seats, 0); const taken = e.taken + mine; const d = dayFromToday(e.day, e.time); return `
-    <section class="card ev-adm" style="--h:${e.hue}"><div class="card-h"><h3>${esc(loc(e, "title"))}</h3><span class="tiny">${esc(relDay(d))} · ${hhmm(e.time)}</span></div>
-      <p class="small">${esc(loc(branch(e.branch)))} · ${esc(loc(e, "kind"))} · ${e.price ? money(e.price) : L("Free", "رایگان")}</p>
+    <section class="card ev-adm" style="--h:${e.hue}"><div class="card-h"><h3>${esc(loc(e, "title"))}</h3><span class="tiny">${esc(relDay(d))} – ${hhmm(e.time)}</span></div>
+      <p class="small">${esc(loc(branch(e.branch)))} – ${esc(loc(e, "kind"))} – ${e.price ? money(e.price) : L("Free", "رایگان")}</p>
       <div class="seats big"><i style="--w:${(taken / e.seats) * 100}%"></i></div>
       <div class="auto-s"><span><b>${num(taken)}/${num(e.seats)}</b>${L("booked", "رزرو")}</span><span><b>${kmoney(taken * e.price)}</b>${L("ticket revenue", "درآمد بلیت")}</span>${mine ? `<span><b>${num(mine)}</b>${L("from this phone", "از همین گوشی")}</span>` : ""}</div>
     </section>`; }).join("")}</div>`;
 }
 
 function reviews() {
-  const appR = appState().orders.filter((o) => o.rating).map((o) => ({ id: o.id, rating: o.rating, text: (o.tags || []).join(" · ") || "—", text_fa: (o.tags || []).join(" · ") || "—", app: true, name: o.customer?.name || "", at: o.at, branch: o.branch }));
+  const appR = appState().orders.filter((o) => o.rating).map((o) => ({ id: o.id, rating: o.rating, text: (o.tags || []).join(" – ") || "—", text_fa: (o.tags || []).join(" – ") || "—", app: true, name: o.customer?.name || "", at: o.at, branch: o.branch }));
   const list = [...appR, ...S.reviews.map((r) => ({ ...r, name: loc(cust(r.customer)) }))].filter((r) => inScope(r.branch)).sort((a, b) => b.at - a.at);
   const avg = list.reduce((s, r) => s + r.rating, 0) / (list.length || 1);
   const dist = [5, 4, 3, 2, 1].map((n) => ({ l: "★".repeat(n), v: list.filter((r) => r.rating === n).length, c: n >= 4 ? "#3C9560" : n === 3 ? "#C9A57C" : "#B4392F" }));
   const rep = getHub().replies;
   return `<div class="cards g2"><section class="card"><div class="card-h"><h3>${L("Average rating", "میانگین امتیاز")}</h3></div><div class="big-num">${digits(avg.toFixed(1))}<small>/ ${digits(5)}</small></div>${bars(dist)}</section>
-    <section class="card"><div class="card-h"><h3>${L("Latest", "تازه‌ترین‌ها")}</h3></div><div class="rlist">${list.slice(0, 12).map((r) => `<div class="rv-i"><div class="rv-top"><span class="stars">${"★".repeat(r.rating)}<i>${"★".repeat(5 - r.rating)}</i></span><b>${esc(r.name)}</b>${r.app ? `<span class="app-pill">${L("from the app", "از اپ")}</span>` : ""}<span class="tiny">${ago(r.at)} · ${esc(loc(branch(r.branch)))}</span></div><p>${esc(L(r.text, r.text_fa))}</p>${rep[r.id] ? `<p class="reply">${icon("send")}${esc(rep[r.id])}</p>` : `<button class="link sm" data-reply="${r.id}">${L("Reply", "پاسخ")}</button>`}</div>`).join("")}</div></section></div>`;
+    <section class="card"><div class="card-h"><h3>${L("Latest", "تازه‌ترین‌ها")}</h3></div><div class="rlist">${list.slice(0, 12).map((r) => `<div class="rv-i"><div class="rv-top"><span class="stars">${"★".repeat(r.rating)}<i>${"★".repeat(5 - r.rating)}</i></span><b>${esc(r.name)}</b>${r.app ? `<span class="app-pill">${L("from the app", "از اپ")}</span>` : ""}<span class="tiny">${ago(r.at)} – ${esc(loc(branch(r.branch)))}</span></div><p>${esc(L(r.text, r.text_fa))}</p>${rep[r.id] ? `<p class="reply">${icon("send")}${esc(rep[r.id])}</p>` : `<button class="link sm" data-reply="${r.id}">${L("Reply", "پاسخ")}</button>`}</div>`).join("")}</div></section></div>`;
 }
 
 function branchesSec() {
   const hub = getHub(), t0 = startOfDay();
   return `<div class="cards g2">${BRANCHES.map((b) => { const o = openState(b), v = busy(b), paused = hub.paused[b.id] > Date.now(); const today = allOrders().filter((x) => x.branch === b.id && x.at >= t0); return `
-    <section class="card br-card"><div class="card-h"><h3>${esc(loc(b))} <span class="tiny">· ${esc(loc(b, "city"))}</span></h3><span class="state-pill ${paused ? "bad" : o.isOpen ? "ok" : ""}">${paused ? L("Paused", "متوقف") : o.isOpen ? L("Open", "باز") : L("Closed", "بسته")}</span></div>
+    <section class="card br-card"><div class="card-h"><h3>${esc(loc(b))} <span class="tiny">– ${esc(loc(b, "city"))}</span></h3><span class="state-pill ${paused ? "bad" : o.isOpen ? "ok" : ""}">${paused ? L("Paused", "متوقف") : o.isOpen ? L("Open", "باز") : L("Closed", "بسته")}</span></div>
       <div class="auto-s"><span><b>${num(today.length)}</b>${L("orders today", "سفارش امروز")}</span><span><b>${kmoney(today.reduce((s, x) => s + x.total, 0))}</b>${L("revenue", "فروش")}</span><span><b>${busyLabel(v)}</b>${L("right now", "همین حالا")}</span></div>
       <p class="small" style="margin-top:12px">${paused ? L(`Online orders paused until ${fmtTime(new Date(hub.paused[b.id]))}. The app tells customers to pick another branch.`, `سفارش آنلاین تا ساعت ${fmtTime(new Date(hub.paused[b.id]))} متوقف است. اپ به مشتری‌ها شعبه‌ی دیگری پیشنهاد می‌دهد.`) : L("Too busy? Pause online orders for a while — the app updates instantly.", "خیلی شلوغ است؟ سفارش آنلاین را موقتاً متوقف کنید؛ اپ فوراً به‌روز می‌شود.")}</p>
       <div class="act-grid">${paused ? `<button class="btn btn--sm" data-resume="${b.id}">${icon("bolt")}${L("Resume orders", "ادامه‌ی سفارش‌ها")}</button>` : [15, 30, 60].map((m) => `<button class="btn btn--sm btn--soft" data-pause="${b.id}" data-m="${m}">${icon("pause")}${L(`${m} min`, `${num(m)} دقیقه`)}</button>`).join("")}</div>
@@ -379,7 +379,7 @@ function shell() {
       <nav class="side-nav">${SECTIONS.map(([k, ic, t]) => `<button class="nav-i" data-sec="${k}" aria-current="${A.section === k}">${icon(ic)}<span>${L(...t)}</span>${k === "orders" ? `<i class="nav-badge" id="nb"></i>` : ""}</button>`).join("")}</nav>
       <div class="side-foot">
         <select id="scope" aria-label="${L("Branch", "شعبه")}"><option value="all">${L("All branches", "همه‌ی شعبه‌ها")}</option>${BRANCHES.map((b) => `<option value="${b.id}" ${A.scope === b.id ? "selected" : ""}>${esc(loc(b))}</option>`).join("")}</select>
-        <div class="side-row"><button class="icon-btn" id="lang" aria-label="language">${icon("globe")}</button><button class="icon-btn" id="theme" aria-label="theme">${icon("moon")}</button><a class="icon-btn" href="index.html" aria-label="${L("Open the app", "باز کردن اپ")}">${icon("coffee")}</a><button class="icon-btn" id="logout" aria-label="${L("Sign out", "خروج")}">${icon("out")}</button></div>
+        <div class="side-row"><button class="icon-btn" id="theme" aria-label="theme">${icon("moon")}</button><a class="icon-btn" href="index.html" aria-label="${L("Open the app", "باز کردن اپ")}">${icon("coffee")}</a><button class="icon-btn" id="logout" aria-label="${L("Sign out", "خروج")}">${icon("out")}</button></div>
         <a class="alpha-sig" href="https://alphaa.agency" target="_blank" rel="noopener" dir="ltr" lang="en"><span>Powered by Alpha Agency</span><img class="sig-light" src="assets/brand/alpha-black.png" alt="Alpha Agency" width="48"><img class="sig-dark" src="assets/brand/alpha-white.png" alt="Alpha Agency" width="48"></a>
       </div>
     </aside>
@@ -392,7 +392,6 @@ function shell() {
   <div id="sheet-root"></div><div id="toast-root" aria-live="polite"></div>`;
   $$(".nav-i").forEach((b) => b.addEventListener("click", () => go(b.dataset.sec)));
   $("#scope").addEventListener("change", (e) => { setA({ scope: e.target.value }); render(); });
-  $("#lang").addEventListener("click", () => { applyLang(getLang() === "fa" ? "en" : "fa"); shell(); render(); });
   $("#theme").addEventListener("click", () => { const d = document.documentElement.dataset.mode === "dark"; applyTheme(d ? "light" : "dark", true); try { const s = JSON.parse(localStorage.getItem("conpanna.v1") || "{}"); s.theme = d ? "light" : "dark"; localStorage.setItem("conpanna.v1", JSON.stringify(s)); } catch (e) {} });
   $("#logout").addEventListener("click", () => { setA({ authed: false }); login(); });
   $("#menu-btn").addEventListener("click", () => $("#adm").classList.toggle("nav-open"));
@@ -406,7 +405,7 @@ function render() {
   const el = $("#sec"); if (!el) return;
   const [, , t] = SECTIONS.find((s) => s[0] === A.section) || SECTIONS[0];
   $("#a-title").textContent = L(...t);
-  $("#a-eyebrow").textContent = `${A.scope === "all" ? L("All branches", "همه‌ی شعبه‌ها") : loc(branch(A.scope))} · ${fmtDay(new Date())}`;
+  $("#a-eyebrow").textContent = `${A.scope === "all" ? L("All branches", "همه‌ی شعبه‌ها") : loc(branch(A.scope))} – ${fmtDay(new Date())}`;
   $$(".nav-i").forEach((b) => b.setAttribute("aria-current", b.dataset.sec === A.section));
   const live = boardOrders().filter((o) => o.status === "new").length;
   $("#nb").textContent = live ? digits(live) : ""; $("#nb").classList.toggle("on", !!live);
@@ -463,7 +462,6 @@ function login() {
     <div class="pin" id="pin" dir="ltr">${[0, 1, 2, 3].map(() => "<i></i>").join("")}</div>
     <div class="pad" dir="ltr">${[1, 2, 3, 4, 5, 6, 7, 8, 9, "", 0, "⌫"].map((k) => k === "" ? "<span></span>" : `<button type="button" data-k="${k}">${typeof k === "number" ? digits(k) : k}</button>`).join("")}</div>
     <p class="tiny">${L("Demo PIN: 1234", "رمز نمونه: ۱۲۳۴")}</p>
-    <button class="link sm" id="lg-lang" type="button">${L("فارسی", "English")}</button>
     <a class="alpha-sig" href="https://alphaa.agency" target="_blank" rel="noopener" dir="ltr" lang="en"><span>Powered by Alpha Agency</span><img class="sig-light" src="assets/brand/alpha-black.png" alt="Alpha Agency" width="48"><img class="sig-dark" src="assets/brand/alpha-white.png" alt="Alpha Agency" width="48"></a>
   </div></div><div id="sheet-root"></div><div id="toast-root"></div>`;
   let v = "";
@@ -478,7 +476,6 @@ function login() {
   };
   $$(".pad button").forEach((b) => b.addEventListener("click", () => press(String(b.dataset.k))));
   addEventListener("keydown", function onKey(e) { if (A.authed) { removeEventListener("keydown", onKey); return; } if (/^\d$/.test(e.key)) press(e.key); if (e.key === "Backspace") press("⌫"); });
-  $("#lg-lang").addEventListener("click", () => { applyLang(getLang() === "fa" ? "en" : "fa"); login(); });
 }
 
 /* ----------------------------------------------------------------- boot */

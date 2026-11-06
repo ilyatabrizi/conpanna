@@ -43,7 +43,7 @@ export default function menu(el, r) {
   const paintList = () => { $("#list", el).innerHTML = cats.map((c) => `<section class="cat" id="cat-${c.id}" data-cat="${c.id}"><h2>${esc(loc(c))}</h2><div class="items">${itemsOf(c).map(row).join("")}</div></section>`).join(""); };
   const paintBranch = () => {
     const nb = branch(get().branch), paused = isPaused(nb.id);
-    $("#m-branch", el).innerHTML = `<span class="row-main"><span class="row-s">${get().mode === "delivery" ? L("Delivering from", "ارسال از") : L("Pick up at", "تحویل در")}</span><span class="row-t" style="font-weight:600">${esc(loc(nb))}${L(", ", "، ")}${esc(loc(nb, "city"))} <span class="tiny">· ${paused ? L("orders paused", "سفارش متوقف") : openState(nb).label}</span></span></span><span class="row-v">${L("Change", "تغییر")}${icon("chev", "chev")}</span>`;
+    $("#m-branch", el).innerHTML = `<span class="row-main"><span class="row-s">${get().mode === "delivery" ? L("Delivering from", "ارسال از") : L("Pick up at", "تحویل در")}</span><span class="row-t" style="font-weight:600">${esc(loc(nb))}${L(", ", "، ")}${esc(loc(nb, "city"))} <span class="tiny">– ${paused ? L("orders paused", "سفارش متوقف") : openState(nb).label}</span></span></span><span class="row-v">${L("Change", "تغییر")}${icon("chev", "chev")}</span>`;
   };
   paintList(); paintBranch();
   segmented($(".seg", el), (v) => { set({ mode: v }); paintBranch(); });

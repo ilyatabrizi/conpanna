@@ -56,7 +56,7 @@ export const MENU = [
     desc: "Ristretto doubles, thin microfoam, a stronger cup than a latte.", desc_fa: "دو شات ریسترتو و میکروفوم نازک؛ قوی‌تر از لاته.", art: { k: "cup", c: "#A97749", t: "heart", bg: "#ECDDCB" }, opts: "milk" },
   { id: "spanish-latte", cat: "hot", name: "Spanish Latte", name_fa: "اسپنیش لاته", price: 165000, pop: 86, pair: "carrot-cake",
     desc: "Condensed milk, espresso, steamed milk. Sweet and round.", desc_fa: "شیر عسلی، اسپرسو و شیر داغ. شیرین و گرد.", art: { k: "cup", c: "#C9A27A", t: "rosetta", bg: "#F2E6D6" }, opts: "milk" },
-  { id: "v60", cat: "hot", name: "V60 · Single origin", name_fa: "وی‌۶۰ · تک‌خاستگاه", price: 190000, pop: 62,
+  { id: "v60", cat: "hot", name: "V60 – Single origin", name_fa: "وی‌۶۰ – تک‌خاستگاه", price: 190000, pop: 62,
     desc: "Hand-poured filter. Ask the bar what's on this week.", desc_fa: "دم‌آوری دستی. قهوه‌ی این هفته را از باریستا بپرسید.", art: { k: "pot", c: "#6B3A1F", bg: "#EFE2D2" }, opts: "black" },
 
   { id: "iced-latte", cat: "cold", name: "Iced Latte", name_fa: "آیس لاته", price: 160000, pop: 85,
@@ -132,7 +132,7 @@ export const EVENTS = [
   { id: "latte-art", title: "Latte Art Workshop", title_fa: "کارگاه لاته‌آرت", branch: "valiasr", day: 2, time: "17:00", dur: 120, seats: 12, taken: 9, price: 450000, kind: "Workshop", kind_fa: "کارگاه", hue: 26,
     host: "Head barista team", host_fa: "تیم سرباریستا", desc: "Steam, pour, repeat. Two hours on the machine learning the heart, the tulip and the rosetta. Milk, beans and your own cups included; you leave with a certificate and a bag of house blend.", desc_fa: "بخار، ریختن، تکرار. دو ساعت پشت دستگاه برای یادگرفتن قلب، لاله و روزتا. شیر، قهوه و فنجان‌ها با ما؛ با گواهی و یک بسته میکس خانگی برمی‌گردید." },
   { id: "acoustic", title: "Acoustic Night", title_fa: "شب آکوستیک", branch: "aseman", day: 1, time: "20:30", dur: 150, seats: 70, taken: 41, price: 0, kind: "Music", kind_fa: "موسیقی", hue: 34,
-    host: "Live set · local artists", host_fa: "اجرای زنده · هنرمندان تبریز", desc: "Unplugged covers and a few originals under the big lamp. Free entry with any order; tables are held for the first ninety minutes.", desc_fa: "اجرای بی‌پلاگ و چند قطعه‌ی تازه زیر چراغ بزرگ. ورود با هر سفارش رایگان است؛ میزها تا نود دقیقه‌ی اول نگه داشته می‌شوند." },
+    host: "Live set – local artists", host_fa: "اجرای زنده – هنرمندان تبریز", desc: "Unplugged covers and a few originals under the big lamp. Free entry with any order; tables are held for the first ninety minutes.", desc_fa: "اجرای بی‌پلاگ و چند قطعه‌ی تازه زیر چراغ بزرگ. ورود با هر سفارش رایگان است؛ میزها تا نود دقیقه‌ی اول نگه داشته می‌شوند." },
   { id: "cupping", title: "Cupping: Single Origins", title_fa: "کاپینگ قهوه‌های تک‌خاستگاه", branch: "elahiparast", day: 4, time: "18:00", dur: 90, seats: 10, taken: 4, price: 290000, kind: "Tasting", kind_fa: "مزه‌کردن", hue: 20,
     host: "Roastery team", host_fa: "تیم رُستری", desc: "Six coffees from Ethiopia, Colombia and Brazil, side by side. Learn to slurp, score and say what you taste.", desc_fa: "شش قهوه از اتیوپی، کلمبیا و برزیل کنار هم. یاد بگیرید بچشید، امتیاز بدهید و طعم را توصیف کنید." },
   { id: "board-games", title: "Board Game Night", title_fa: "شب بازی‌های رومیزی", branch: "esfahan", day: 3, time: "19:00", dur: 180, seats: 32, taken: 18, price: 0, kind: "Community", kind_fa: "دورهمی", hue: 30,

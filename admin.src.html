@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -17,8 +17,7 @@
   (function () {
     var d = document.documentElement, pref = "system";
     try { var s = JSON.parse(localStorage.getItem("conpanna.v1") || "{}"); pref = s.theme || "system"; } catch (e) {}
-    var lang = "fa"; try { lang = localStorage.getItem("conpanna.lang") || ((navigator.language || "").toLowerCase().indexOf("fa") === 0 ? "fa" : "en"); } catch (e) {}
-    d.lang = lang; d.dir = lang === "fa" ? "rtl" : "ltr";
+    d.lang = "fa"; d.dir = "rtl";
     var dark = pref === "dark" || (pref !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
     d.setAttribute("data-theme", pref); d.setAttribute("data-mode", dark ? "dark" : "light");
     d.className += " admin-page";

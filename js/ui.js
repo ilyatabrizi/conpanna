@@ -104,7 +104,7 @@ export function openState(b, now = tehranNow()) {
   const m = now.getHours() * 60 + now.getMinutes();
   const o = toMin(b.open), c = toMin(b.close) || 1440;
   const isOpen = m >= o && m < c;
-  return { isOpen, label: isOpen ? L(`Open · until ${b.close === "24:00" ? "midnight" : b.close}`, `باز · تا ${b.close === "24:00" ? "نیمه‌شب" : digits(b.close)}`) : L(`Closed · opens ${b.open}`, `بسته · از ${digits(b.open)}`) };
+  return { isOpen, label: isOpen ? L(`Open – until ${b.close === "24:00" ? "midnight" : b.close}`, `باز – تا ${b.close === "24:00" ? "نیمه‌شب" : digits(b.close)}`) : L(`Closed – opens ${b.open}`, `بسته – از ${digits(b.open)}`) };
 }
 // a believable curve: quiet mornings, a lunch bump, full evenings. Demo only.
 export function busy(b, now = tehranNow()) {

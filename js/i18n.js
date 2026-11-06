@@ -2,20 +2,21 @@
 // L("English", "فارسی"). Data carries its own pairs (name / name_fa).
 // Persian: right-to-left, IRANYekanX, Persian digits, Toman, Jalali dates.
 const KEY = "conpanna.lang";
+// This build is Persian only. English strings stay in the code for the
+// English build; only the tab bar and Alpha's signature are shown in English.
 let lang = "fa";
-try {
-  const saved = localStorage.getItem(KEY);
-  lang = saved || ((navigator.language || "").toLowerCase().startsWith("fa") ? "fa" : "en");
-} catch (e) {}
 
 export const getLang = () => lang;
 export const isFa = () => lang === "fa";
-export const hasChosen = () => { try { return !!localStorage.getItem(KEY); } catch (e) { return true; } };
-export const L = (en, fa) => (lang === "fa" && fa != null ? fa : en);
+export const hasChosen = () => true;
+// A leading "+" before a number flips to the wrong side in right-to-left text;
+// isolating "+۳۰" as a left-to-right run keeps it reading "+۳۰".
+const signFix = (s) => (typeof s === "string" ? s.replace(/(^|[\s(·،:—])([+−-])([0-9۰-۹][0-9۰-۹٬,.]*)/g, "$1\u2066$2$3\u2069") : s);
+export const L = (en, fa) => (lang === "fa" && fa != null ? signFix(fa) : en);
 export const loc = (o, k = "name") => (o ? (lang === "fa" && o[k + "_fa"] != null ? o[k + "_fa"] : o[k]) : "");
 
-export function applyLang(next = lang) {
-  lang = next;
+export function applyLang() {
+  lang = "fa";
   try { localStorage.setItem(KEY, lang); } catch (e) {}
   const d = document.documentElement;
   d.lang = lang;

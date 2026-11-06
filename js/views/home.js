@@ -17,7 +17,7 @@ export function clubCard(s, { link = true } = {}) {
   return `<${link ? `a href="#/rewards"` : "div"} class="club" style="--fill:${8 + (s.stamps / goal) * 62}%;--tier:${t.color}">
     <div class="wave">${WAVES}</div>
     <div class="club-top">
-      <div><p class="club-k">${L("Conpanna Club", "باشگاه کن‌پانا")} · <b>${esc(loc(t))}</b></p>
+      <div><p class="club-k">${L("Conpanna Club", "باشگاه کن‌پانا")} – <b>${esc(loc(t))}</b></p>
       <h3>${s.rewards ? L(`${s.rewards} free ${s.rewards === 1 ? "drink" : "drinks"} waiting`, `${num(s.rewards)} نوشیدنی رایگان منتظر شماست`) : L(`${goal - s.stamps} more to a free drink`, `${num(goal - s.stamps)} مهر تا نوشیدنی رایگان`)}</h3></div>
       <span class="club-pts"><b>${num(s.points)}</b><small>${L("points", "امتیاز")}</small></span>
     </div>
@@ -50,7 +50,7 @@ export default function home(el) {
     </div>
     <div class="wrap hero-in">
       <div class="hero-copy">
-        <p class="eyebrow">${greeting()}${name ? `, ${esc(name)}` : ""} · ${esc(loc(b, "city"))}</p>
+        <p class="eyebrow">${greeting()}${name ? `, ${esc(name)}` : ""} – ${esc(loc(b, "city"))}</p>
         <h1><span class="tr" lang="tr" dir="ltr">Bu tat <em>senin.</em></span></h1>
         <p class="sub">${L("This taste is yours. Order ahead for delivery or takeaway, check in for stamps, and see what's on this week.", "این طعم، مال توست. برای ارسال یا بیرون‌بر از قبل سفارش بدهید، با ورود به کافه مهر بگیرید و برنامه‌های این هفته را ببینید.")}</p>
         <button class="hero-pill" id="h-branch" type="button"></button>
@@ -81,7 +81,7 @@ export default function home(el) {
           <span class="ev-bg"></span>
           <span class="ev-kind">${esc(loc(next, "kind"))}</span>
           <h3>${esc(loc(next, "title"))}</h3>
-          <div class="ev-meta"><span>${icon("events")}${esc(relDay(next.date))} · ${hhmm(next.time)}</span><span>${icon("pin")}${esc(loc(branch(next.branch)))}</span><span>${icon("users")}${L(`${next.seats - next.taken} seats left`, `${num(next.seats - next.taken)} جای خالی`)}</span></div>
+          <div class="ev-meta"><span>${icon("events")}${esc(relDay(next.date))} – ${hhmm(next.time)}</span><span>${icon("pin")}${esc(loc(branch(next.branch)))}</span><span>${icon("users")}${L(`${next.seats - next.taken} seats left`, `${num(next.seats - next.taken)} جای خالی`)}</span></div>
         </a>
       </section>
     </div>
@@ -93,7 +93,7 @@ export default function home(el) {
       <div class="group">${BRANCHES.map((x) => { const st = openState(x), v = busy(x); return `
         <a class="row branch-row" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(x.query)}" target="_blank" rel="noopener">
           <span class="row-ic">${icon("pin")}</span>
-          <span class="row-main"><span class="row-t">${esc(loc(x))} <span class="tiny">· ${esc(loc(x, "city"))}</span></span><span class="row-s flexline"><span class="dot ${st.isOpen ? "" : "off"}"></span>${st.label}${st.isOpen ? ` · ${busyLabel(v)}` : ""}</span></span>
+          <span class="row-main"><span class="row-t">${esc(loc(x))} <span class="tiny">– ${esc(loc(x, "city"))}</span></span><span class="row-s flexline"><span class="dot ${st.isOpen ? "" : "off"}"></span>${st.label}${st.isOpen ? ` – ${busyLabel(v)}` : ""}</span></span>
           ${icon("chev", "chev")}
         </a>`; }).join("")}
       </div>
@@ -101,7 +101,7 @@ export default function home(el) {
 
     <a class="ig-card rv" href="https://instagram.com/${BRAND.instagram}" target="_blank" rel="noopener">
       <span class="ig-ring"><span>${LOCKUP.replace('class="logo"', 'class="logo" style="width:84%"')}</span></span>
-      <span class="row-main"><span class="row-t" style="font-weight:600" dir="ltr">@${BRAND.instagram}</span><span class="row-s">${L(`${BRAND.followers} followers · reels, new drinks, the autumn café-hop`, `${BRAND.followers_fa} دنبال‌کننده · ریلز، نوشیدنی‌های تازه، کافه‌گردی پاییزی`)}</span></span>
+      <span class="row-main"><span class="row-t lat" style="font-weight:600">@${BRAND.instagram}</span><span class="row-s">${L(`${BRAND.followers} followers – reels, new drinks, the autumn café-hop`, `${BRAND.followers_fa} دنبال‌کننده – ریلز، نوشیدنی‌های تازه، کافه‌گردی پاییزی`)}</span></span>
       ${icon("ig")}
     </a>
     ${footer()}
@@ -112,7 +112,7 @@ export default function home(el) {
   el.addEventListener("stirred", () => { $("#stir-hint", el)?.classList.add("gone"); haptic(6); });
   const paintPill = () => {
     const nb = branch(get().branch), st = openState(nb), v = busy(nb), paused = isPaused(nb.id);
-    $("#h-branch", el).innerHTML = `<span class="dot ${st.isOpen && !paused ? "pulse" : "off"}"></span>${esc(loc(nb))} · ${paused ? L("Orders paused", "سفارش متوقف") : st.isOpen ? busyLabel(v) : st.label}${icon("chevD")}`;
+    $("#h-branch", el).innerHTML = `<span class="dot ${st.isOpen && !paused ? "pulse" : "off"}"></span>${esc(loc(nb))} – ${paused ? L("Orders paused", "سفارش متوقف") : st.isOpen ? busyLabel(v) : st.label}${icon("chevD")}`;
   };
   paintPill();
   $("#h-branch", el).addEventListener("click", () => branchSheet({ onPick: paintPill }));
@@ -132,7 +132,7 @@ export default function home(el) {
       <div class="sig-card ${out ? "out" : ""}" role="button" tabindex="0" data-item="${m.id}">
         ${m.isNew ? `<span class="badge-new">${L("New", "جدید")}</span>` : ""}${out ? `<span class="badge-out">${L("Sold out", "تمام شد")}</span>` : ""}
         ${tile(m)}
-        <h3>${esc(loc(m))}</h3><span class="alt-name">${esc(L(m.name_fa, m.name))}</span>
+        <h3>${esc(loc(m))}</h3>
         <div class="row2">${money(unitPrice(m, {}))}<button class="add" type="button" data-add="${m.id}" aria-label="${L("Add", "افزودن")} ${esc(loc(m))}" ${out ? "disabled" : ""}>${icon("plus")}</button></div>
       </div>`; }).join("");
   };
@@ -147,12 +147,12 @@ export default function home(el) {
       <a href="#/rewards?s=invite"><span class="q-ic">${icon("users")}</span><span><b>${L("Invite", "دعوت")}</b><span>${L("Both get a drink", "هر دو نوشیدنی")}</span></span></a>`;
     // challenge
     const tried = (st.tried || []).length;
-    $("#challenge", el).innerHTML = `<span class="ch-ring" style="--p:${Math.min(1, tried / CHALLENGE.goal)}"><b>${num(Math.min(tried, CHALLENGE.goal))}/${num(CHALLENGE.goal)}</b></span><span class="row-main"><span class="eyebrow">${L("Challenge", "چالش")} · ${esc(loc(CHALLENGE, "title"))}</span><span class="row-t">${esc(loc(CHALLENGE, "sub"))}</span><span class="row-s">${st.challengeDone ? L("Done — a free cake is in your rewards", "انجام شد؛ یک کیک رایگان در جوایز شماست") : L("Reward: any cake, free", "جایزه: یک کیک رایگان")}</span></span>${icon("chev", "chev")}`;
+    $("#challenge", el).innerHTML = `<span class="ch-ring" style="--p:${Math.min(1, tried / CHALLENGE.goal)}"><b>${num(Math.min(tried, CHALLENGE.goal))}/${num(CHALLENGE.goal)}</b></span><span class="row-main"><span class="eyebrow">${L("Challenge", "چالش")} – ${esc(loc(CHALLENGE, "title"))}</span><span class="row-t">${esc(loc(CHALLENGE, "sub"))}</span><span class="row-s">${st.challengeDone ? L("Done — a free cake is in your rewards", "انجام شد؛ یک کیک رایگان در جوایز شماست") : L("Reward: any cake, free", "جایزه: یک کیک رایگان")}</span></span>${icon("chev", "chev")}`;
     // live order
     const a = active()[0];
     $("#live", el).innerHTML = a ? (() => { const steps = STEPS[a.mode], i = stageOf(a); return `<a class="live-order" href="#/order/${a.id}">
         <span class="lo-code">#${digits(a.code)}</span>
-        <span class="row-main"><span class="eyebrow">${a.mode === "delivery" ? L("Delivery", "ارسال") : L("Takeaway", "بیرون‌بر")} · ${esc(loc(branch(a.branch)))}</span><span class="t3">${esc(stepTitle(steps[i]))}</span><span class="lo-steps">${steps.map((_, k) => `<i class="${k <= i ? "on" : ""}"></i>`).join("")}</span></span>${icon("chev", "chev")}</a>`; })() : "";
+        <span class="row-main"><span class="eyebrow">${a.mode === "delivery" ? L("Delivery", "ارسال") : L("Takeaway", "بیرون‌بر")} – ${esc(loc(branch(a.branch)))}</span><span class="t3">${esc(stepTitle(steps[i]))}</span><span class="lo-steps">${steps.map((_, k) => `<i class="${k <= i ? "on" : ""}"></i>`).join("")}</span></span>${icon("chev", "chev")}</a>`; })() : "";
     // your usual
     const u = usual();
     const ui = u && item(u.id);

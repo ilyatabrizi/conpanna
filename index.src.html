@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -31,8 +31,7 @@
     var d = document.documentElement, pref = "system", warm = false, calm = false;
     try { var s = JSON.parse(localStorage.getItem("conpanna.v1") || "{}"); pref = s.theme || "system"; calm = !!(s.prefs && s.prefs.reduceMotion); } catch (e) {}
     try { warm = sessionStorage.getItem("conpanna.booted") === "1"; } catch (e) {}
-    var lang = "fa"; try { lang = localStorage.getItem("conpanna.lang") || ((navigator.language || "").toLowerCase().indexOf("fa") === 0 ? "fa" : "en"); } catch (e) {}
-    d.lang = lang; d.dir = lang === "fa" ? "rtl" : "ltr";
+    d.lang = "fa"; d.dir = "rtl";
     var dark = pref === "dark" || (pref !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
     d.setAttribute("data-theme", pref);
     d.setAttribute("data-mode", dark ? "dark" : "light");
@@ -67,7 +66,6 @@ __PRELOAD__
   <a class="bar-logo" id="bar-logo" href="#/" aria-label="Coffee Conpanna — home"></a>
   <span class="bar-title" id="bar-title" aria-hidden="true"></span>
   <div class="bar-right">
-    <button class="bar-btn bar-lang" id="bar-lang" type="button"></button>
     <button class="bar-btn" id="bar-bell" type="button" aria-label="Notifications"><span class="bell-dot" id="bell-dot"></span></button>
   </div>
 </header>

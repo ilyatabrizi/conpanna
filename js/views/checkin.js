@@ -28,10 +28,10 @@ export default function checkin(el) {
       <div class="page-head"><div><h1 class="lt">${L("Check in", "ورود به کافه")}</h1><p class="small">${L("Tell us you're here: a stamp and points for your card, the Wi-Fi, and your order brought to your table.", "بگویید رسیدید: مهر و امتیاز برای کارتتان، رمز وای‌فای و سفارشی که سر میز می‌آید.")}</p></div></div>
       ${cur ? `
       <section class="here">
-        <div class="here-top"><div><p class="eyebrow">${L("You're checked in · since", "حضور ثبت شد · از ساعت")} ${fmtTime(new Date(cur.at))}</p><h2>${L("Conpanna", "کن‌پانا")} ${esc(loc(b))}</h2></div><span class="dot pulse" style="margin-top:8px"></span></div>
+        <div class="here-top"><div><p class="eyebrow">${L("You're checked in – since", "حضور ثبت شد – از ساعت")} ${fmtTime(new Date(cur.at))}</p><h2>${L("Conpanna", "کن‌پانا")} ${esc(loc(b))}</h2></div><span class="dot pulse" style="margin-top:8px"></span></div>
         <p class="small" style="margin-top:6px">${esc(loc(b, "note"))}</p>
         <div class="here-grid">
-          <button type="button" id="wifi">${icon("wifi")}<b>${L("Wi-Fi", "وای‌فای")}</b><span dir="ltr">${BRAND.wifi.ssid}</span><span>${L("tap to copy password", "برای کپی رمز بزنید")}</span></button>
+          <button type="button" id="wifi">${icon("wifi")}<b>${L("Wi-Fi", "وای‌فای")}</b><span class="lat">${BRAND.wifi.ssid}</span><span>${L("tap to copy password", "برای کپی رمز بزنید")}</span></button>
           <button type="button" id="table">${icon("table")}<b>${cur.table ? L(`Table ${cur.table}`, `میز ${digits(cur.table)}`) : L("Your table", "میز شما")}</b><span>${cur.table ? L("Tap to change", "برای تغییر بزنید") : L("Add it and we'll bring your order", "شماره‌ی میز را بزنید تا سفارش را بیاوریم")}</span></button>
           <a href="#/menu" id="order-seat">${icon("menu")}<b>${L("Order from your seat", "سفارش از سر میز")}</b><span>${L("Skip the queue at the counter", "بدون صف صندوق")}</span></a>
           <button type="button" id="out">${icon("door")}<b>${L("Check out", "خروج")}</b><span>${L("Leaving? See you soon", "دارید می‌روید؟ به امید دیدار")}</span></button>
@@ -48,9 +48,9 @@ export default function checkin(el) {
         <div class="hold-wrap">
           <button class="hold" id="hold" type="button" aria-label="${L("Hold to check in", "برای ورود نگه دارید")}">
             <span class="liq">${WAVE}</span>
-            <span class="hold-in">${icon("checkin")}<b>${L("Hold to check in", "نگه دارید تا وارد شوید")}</b><span id="hold-at">${L("at", "در")} ${esc(loc(b))}</span></span>
+            <span class="hold-in">${icon("checkin")}<b>${L("Hold to check in", "برای ورود نگه دارید")}</b><span id="hold-at">${L("at", "در")} ${esc(loc(b))}</span></span>
           </button>
-          <p class="tiny" style="margin-top:16px;text-align:center">${L(`Press and hold until the cup fills · +1 stamp · +${POINTS.perCheckin} points`, `نگه دارید تا فنجان پر شود · +۱ مهر · +${num(POINTS.perCheckin)} امتیاز`)}</p>
+          <p class="tiny" style="margin-top:16px;text-align:center">${L(`Press and hold until the cup fills – +1 stamp – +${POINTS.perCheckin} points`, `نگه دارید تا فنجان پر شود – +۱ مهر – +${num(POINTS.perCheckin)} امتیاز`)}</p>
         </div>
       </section>`}
 
@@ -60,7 +60,7 @@ export default function checkin(el) {
       </section>
 
       ${visits.length ? `<section style="margin-top:30px"><p class="group-label">${L("Recent visits", "بازدیدهای اخیر")}</p><div class="group">${visits.map((v) => `
-        <div class="row"><span class="row-ic soft">${icon("pin")}</span><span class="row-main"><span class="row-t">${esc(loc(branch(v.branch)))}</span><span class="row-s">${ago(v.at)}${v.stamp ? L(" · +1 stamp", " · +۱ مهر") : ""}</span></span></div>`).join("")}</div></section>` : ""}
+        <div class="row"><span class="row-ic soft">${icon("pin")}</span><span class="row-main"><span class="row-t">${esc(loc(branch(v.branch)))}</span><span class="row-s">${ago(v.at)}${v.stamp ? L(" – +1 stamp", " – +۱ مهر") : ""}</span></span></div>`).join("")}</div></section>` : ""}
       ${footer()}
     </div>`;
     wire();
@@ -77,10 +77,10 @@ export default function checkin(el) {
     haptic(25);
     const hb = $("#hold", el)?.getBoundingClientRect();
     if (hb) burst(hb.left + hb.width / 2, hb.top + hb.height / 2);
-    notify({ title: L(`Welcome to Conpanna ${b.name}`, `به کن‌پانا ${b.name_fa} خوش آمدید`), body: L(`${stamp ? "+1 stamp. " : ""}Wi-Fi: ${BRAND.wifi.ssid} · ${BRAND.wifi.pass}`, `${stamp ? "+۱ مهر. " : ""}وای‌فای: ${BRAND.wifi.ssid} · ${BRAND.wifi.pass}`), cat: "checkin", url: "#/checkin" });
+    notify({ title: L(`Welcome to Conpanna ${b.name}`, `به کن‌پانا ${b.name_fa} خوش آمدید`), body: L(`${stamp ? "+1 stamp. " : ""}Wi-Fi: ${BRAND.wifi.ssid} – ${BRAND.wifi.pass}`, `${stamp ? "+۱ مهر. " : ""}وای‌فای: ${BRAND.wifi.ssid} – ${BRAND.wifi.pass}`), cat: "checkin", url: "#/checkin" });
     paint();
-    if (tierUp) celebrate({ icon: "crown", title: L(`Welcome to ${tierUp.name}`, `به سطح ${tierUp.name_fa} خوش آمدید`), body: L(tierUp.perks.join(" · "), tierUp.perks_fa.join(" · ")), cta: L("See your perks", "دیدن مزایا"), href: "#/rewards" });
-    else toast(earned ? L("Card full — a free drink is yours", "کارت پر شد؛ یک نوشیدنی رایگان مال شماست") : stamp ? L("Checked in · +1 stamp", "ورود ثبت شد · +۱ مهر") : L("Checked in · stamp already collected today", "ورود ثبت شد · مهر امروز قبلاً گرفته شده"), earned ? "gift" : "check");
+    if (tierUp) celebrate({ icon: "crown", title: L(`Welcome to ${tierUp.name}`, `به سطح ${tierUp.name_fa} خوش آمدید`), body: L(tierUp.perks.join(" – "), tierUp.perks_fa.join(" – ")), cta: L("See your perks", "دیدن مزایا"), href: "#/rewards" });
+    else toast(earned ? L("Card full — a free drink is yours", "کارت پر شد؛ یک نوشیدنی رایگان مال شماست") : stamp ? L("Checked in – +1 stamp", "ورود ثبت شد – +۱ مهر") : L("Checked in – stamp already collected today", "ورود ثبت شد – مهر امروز قبلاً گرفته شده"), earned ? "gift" : "check");
   }
 
   function wire() {
@@ -109,8 +109,8 @@ export default function checkin(el) {
       hold.addEventListener("keydown", (e) => { if (e.key !== "Enter" && e.key !== " ") return; e.preventDefault(); if (reduced()) { doCheckin(); return; } pressing = true; t0 = performance.now() - HOLD_MS * .6; cancelAnimationFrame(raf); raf = requestAnimationFrame(step); });
     }
     $("#wifi", el)?.addEventListener("click", async (e) => {
-      try { await navigator.clipboard.writeText(BRAND.wifi.pass); toast(L(`Password copied · ${BRAND.wifi.pass}`, `رمز کپی شد · ${BRAND.wifi.pass}`), "wifi"); }
-      catch (err) { toast(`${L("Wi-Fi password", "رمز وای‌فای")}: ${BRAND.wifi.pass}`, "wifi"); }
+      try { await navigator.clipboard.writeText(BRAND.wifi.pass); toast(L(`Password copied – ${BRAND.wifi.pass}`, `رمز کپی شد – <span class="lat">${BRAND.wifi.pass}</span>`), "wifi"); }
+      catch (err) { toast(`${L("Wi-Fi password", "رمز وای‌فای")}: <span class="lat">${BRAND.wifi.pass}</span>`, "wifi"); }
       replay(e.currentTarget, "gulp");
     });
     $("#table", el)?.addEventListener("click", () => {

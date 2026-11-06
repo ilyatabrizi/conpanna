@@ -86,34 +86,6 @@ function chrome() {
 addEventListener("scroll", chrome, { passive: true });
 addEventListener("resize", chrome);
 
-/* --------------------------------------------------------------- language */
-export function switchLang(next) {
-  if (next === getLang()) return;
-  flush();
-  applyLang(next);
-  document.documentElement.classList.add("lang-swap");
-  paintLabels();
-  render();
-  setTimeout(() => document.documentElement.classList.remove("lang-swap"), 500);
-}
-onSwitchLang((l) => { switchLang(l); paintLangBtn(); });
-function langPicker() {
-  sheet(`<div class="lang-pick">
-      <div class="lp-mark">${LOCKUP}</div>
-      <h2>Choose your language<span class="fa-line">زبان را انتخاب کنید</span></h2>
-      <div class="lp-opts">
-        <button type="button" data-l="fa"><b>فارسی</b><span>Persian</span></button>
-        <button type="button" data-l="en"><b>English</b><span>انگلیسی</span></button>
-      </div>
-      <p class="tiny">You can change it any time in Settings · بعداً هم از تنظیمات قابل تغییر است</p>
-    </div>`, { label: "Language", cls: "sheet-lang", onMount(b) {
-    $$("[data-l]", b).forEach((x) => x.addEventListener("click", () => { haptic(8); switchLang(x.dataset.l); applyLang(x.dataset.l); closeSheet(); }));
-  }, onClose: () => { if (!hasChosen()) applyLang(getLang()); } });
-}
-$("#bar-lang").innerHTML = icon("globe") + `<span class="lang-l"></span>`;
-const paintLangBtn = () => { $("#bar-lang .lang-l").textContent = getLang() === "fa" ? "EN" : "فا"; $("#bar-lang").setAttribute("aria-label", L("فارسی", "English")); };
-$("#bar-lang").addEventListener("click", () => { haptic(6); switchLang(getLang() === "fa" ? "en" : "fa"); paintLangBtn(); toast(L("English", "فارسی"), "globe"); });
-
 /* ------------------------------------------------------------------ inbox */
 const CAT_IC = { order: ["receipt", "#45281A"], events: ["events", "#8A5A2E"], offers: ["gift", "#B4682F"], checkin: ["checkin", "#3C9560"], system: ["bell", "#75604F"], digest: ["spark", "#94653A"] };
 function paintBell() { $("#bell-dot").classList.toggle("on", unread() > 0); }
@@ -161,7 +133,6 @@ function boot() {
   applyCalm();
   $("#bar-logo").innerHTML = LOCKUP;
   $("#bar-back").innerHTML = icon("back");
-  paintLangBtn();
   initTabbar();
   paintBell();
   render();
@@ -174,7 +145,6 @@ function boot() {
     if (b) { b.classList.add("out"); setTimeout(() => b.remove(), 700); }
     document.documentElement.classList.remove("booting");
     try { sessionStorage.setItem("conpanna.booted", "1"); } catch (e) {}
-    if (!hasChosen()) setTimeout(langPicker, 450);
   }, warm ? 650 : 2650);
 }
 boot();

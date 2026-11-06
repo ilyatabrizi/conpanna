@@ -11,8 +11,8 @@ import { L, digits } from "./i18n.js";
 
 const LABELS = { home: ["Home", "خانه"], menu: ["Menu", "منو"], checkin: ["Check-in", "ورود"], events: ["Events", "رویدادها"], profile: ["Profile", "پروفایل"] };
 export function paintLabels() {
-  tabs.forEach((t) => { const l = LABELS[t.dataset.tab]; t.querySelector(".tab-l").textContent = L(l[0], l[1]); });
-  document.querySelector(".bag-l").textContent = L("Bag", "سبد");
+  tabs.forEach((t) => { const l = LABELS[t.dataset.tab]; t.querySelector(".tab-l").textContent = l[0]; });
+  document.querySelector(".bag-l").textContent = "Bag";
   place();
 }
 // the tabs as they sit on screen, left to right (Persian lays them out mirrored)
@@ -62,12 +62,12 @@ export function setTone(dark) { bar.dataset.tone = dark ? "dark" : "light"; }
 function paintBag() {
   const b = $("#bag-badge");
   const n = bagCount();
-  const txt = digits(n > 99 ? "99+" : String(n));
+  const txt = n > 99 ? "99+" : String(n);
   const changed = b.textContent !== txt;
   b.textContent = txt;
   b.classList.toggle("on", n > 0);
   bagBtn.classList.toggle("has", n > 0);
-  bagBtn.setAttribute("aria-label", L(n ? `Bag, ${n} items` : "Bag", n ? `سبد، ${n} قلم` : "سبد"));
+  bagBtn.setAttribute("aria-label", n ? `Bag, ${n} items` : "Bag");
   if (changed && n > 0) { replay(b, "pop"); replay(bagBtn, "gulp"); }
 }
 
