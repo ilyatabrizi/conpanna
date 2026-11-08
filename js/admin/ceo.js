@@ -66,6 +66,7 @@ export function alerts() {
   (A().closes || []).filter((c) => c.day === tk && X.inScope(c.branch) && Math.abs(c.diff) >= X.cfg().tol).forEach((c) => out.push({ r: "cash", k: "warn", ic: "cash", t: `اختلاف صندوق ${bname(c.branch)}`, s: `${c.diff < 0 ? "کسری" : "اضافه"} ${kmoney(Math.abs(c.diff))} تومان موقع بستن صندوق`, act: ["صندوق", "cash"] }));
   const fl = A().cflags || {}, eod = new Date().setHours(23, 59, 59, 999), fu = Object.values(fl).filter((f) => f.follow && f.follow <= eod).length;
   if (fu) out.push({ r: "crm", k: "info", ic: "users", t: `${num(fu)} مشتری امروز پیگیری می‌خوان`, s: "یادآوری‌هایی که خودت گذاشتی", act: ["مشتری‌ها", "customers"] });
+  (X.extraAlerts?.() || []).forEach((x) => out.push(x));
   const ord = { bad: 0, warn: 1, info: 2 };
   const R = A().alertRules || {}, DEFR = { staff: false };
   return out.filter((a) => !a.r || (R[a.r] ?? DEFR[a.r] ?? true)).filter((a) => !(A().dismissed || []).includes(a.t)).sort((a, b) => ord[a.k] - ord[b.k]);
@@ -302,7 +303,7 @@ function products() {
       ${card("سهم هر دسته از فروش", barsH(cats.map((x) => ({ ...x, f: pct(Math.round((x.v / (totRev || 1)) * 100)) }))))}
       ${card("بیشتر با هم سفارش می‌دن", barsH(topPairs.map(([k, v]) => ({ l: k.split("|").map((id) => esc(loc(item(id)))).join(" + "), v }))))}
     </div>
-    ${card("همه‌ی آیتم‌ها", table(["آیتم", "تعداد", "فروش", "سهم", "هزینه‌ی مواد", "سود هر عدد", "حاشیه", "روند"], rows.map((r) => { const d = r.pu ? Math.round(((r.u - r.pu) / r.pu) * 100) : 0; return [`<span class="it-cell">${tile(r.m, "sm")}${esc(loc(r.m))}</span>`, num(r.u), kmoney(r.rev), pct(Math.round((r.rev / (totRev || 1)) * 100)), pct(Math.round((r.cost / (r.rev || 1)) * 100)), kk((r.rev - r.cost) / r.u), pct(Math.round(((r.rev - r.cost) / (r.rev || 1)) * 100)), `<span class="delta ${d >= 0 ? "up" : "down"}">${d >= 0 ? "▲" : "▼"} ${pct(Math.abs(d))}</span>`]; }), { cls: "itbl" }), { extra: `<button class="btn btn--sm btn--soft" data-csv="items">${icon("dl")}خروجی اکسل</button>` })}`;
+    ${card("همه‌ی آیتم‌ها", table(["آیتم", "تعداد", "فروش", "سهم", "هزینه‌ی مواد", "سود هر عدد", "حاشیه", "روند"], rows.map((r) => { const d = r.pu ? Math.round(((r.u - r.pu) / r.pu) * 100) : 0; return [`<span class="it-cell">${tile(r.m, "sm")}<button class="link item-l" data-item="${r.m.id}">${esc(loc(r.m))}</button></span>`, num(r.u), kmoney(r.rev), pct(Math.round((r.rev / (totRev || 1)) * 100)), pct(Math.round((r.cost / (r.rev || 1)) * 100)), kk((r.rev - r.cost) / r.u), pct(Math.round(((r.rev - r.cost) / (r.rev || 1)) * 100)), `<span class="delta ${d >= 0 ? "up" : "down"}">${d >= 0 ? "▲" : "▼"} ${pct(Math.abs(d))}</span>`]; }), { cls: "itbl" }), { extra: `<button class="btn btn--sm btn--soft" data-csv="items">${icon("dl")}خروجی اکسل</button>` })}`;
 }
 
 /* ------------------------------------------------------------ customer insight */
@@ -353,7 +354,7 @@ function branches() {
   const best = [...rows].sort((a, b) => b.x.np - a.x.np)[0];
   return `${periodBar(P)}
     ${card("مقایسه‌ی شعبه‌ها", table(["شعبه", "فروش", "روند", "سفارش", "میانگین فاکتور", "رضایت", "آماده‌سازی", "پرسنل", "فروش هر صندلی در روز", "فروش هر نفر‌ساعت", "سود خالص"],
-      rows.map((r) => [`<b>${esc(loc(r.b))}</b>${r.b.id === best?.b.id ? ` ${pill("بهترین", "ok")}` : ""}${OPENED[r.b.id] ? ` ${pill("تازه افتتاح", "info")}` : ""}`, kmoney(r.rev), spark(r.spark), num(r.c.length), kk(r.rev / (r.c.length || 1)), fa1(r.rating), mins(r.prep), num(r.staff), kk(r.perSeat), kk(r.perHour), `<b class="${r.x.np >= 0 ? "pos" : "neg"}">${kmoney(r.x.np)}</b>`])), { extra: `<button class="btn btn--sm btn--soft" data-csv="branches">${icon("dl")}خروجی اکسل</button>` })}
+      rows.map((r) => [`<button class="link branch-l" data-branch="${r.b.id}"><b>${esc(loc(r.b))}</b></button>${r.b.id === best?.b.id ? ` ${pill("بهترین", "ok")}` : ""}${OPENED[r.b.id] ? ` ${pill("تازه افتتاح", "info")}` : ""}`, kmoney(r.rev), spark(r.spark), num(r.c.length), kk(r.rev / (r.c.length || 1)), fa1(r.rating), mins(r.prep), num(r.staff), kk(r.perSeat), kk(r.perHour), `<b class="${r.x.np >= 0 ? "pos" : "neg"}">${kmoney(r.x.np)}</b>`])), { extra: `<button class="btn btn--sm btn--soft" data-csv="branches">${icon("dl")}خروجی اکسل</button>` })}
     <div class="cards g2">${brs().map((b) => { const o = openState(b), v = busy(b), paused = hub.paused[b.id] > Date.now(); const today = done(all.filter((x) => x.branch === b.id && x.day === 0)); const ci = X.S.checkins[`0|${b.id}`] || 0; return `
       <section class="card br-card"><div class="card-h"><h3>${esc(loc(b))} <span class="tiny">– ${esc(loc(b, "city"))}${OPENED[b.id] ? ` – ${num(OPENED[b.id])} روزه باز شده` : ""}</span></h3><span class="state-pill ${paused ? "bad" : o.isOpen ? "ok" : ""}">${paused ? "سفارش آنلاین بسته" : o.isOpen ? "بازه" : "بسته‌ست"}</span></div>
         <div class="auto-s"><span><b>${num(today.length)}</b>سفارش امروز</span><span><b>${kmoney(sum(today))}</b>فروش</span><span><b>${num(ci)}</b>ورود به کافه</span><span><b>${busyLabel(v)}</b>الان</span></div>

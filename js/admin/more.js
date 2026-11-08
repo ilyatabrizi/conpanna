@@ -115,7 +115,7 @@ function settings() {
     ${card("داده‌های نمایشی", `<p class="small">همه‌ی کارهایی که تو پنل کردی (یادداشت‌ها، کمپین‌ها، صندوق، هدف‌ها و تنظیمات) رو پاک می‌کنه و پنل رو مثل روز اول می‌کنه.</p><button class="btn btn--sm btn--ghost danger" id="set-reset" style="margin-top:14px">${icon("trash")}از اول شروع کن</button>`, { cls: "wide" })}
   </div>`;
 }
-export const KEYS = [[["⌘", "K"], "جست‌وجو و پرش به هر جا"], [["/"], "جست‌وجو"], [["["], "جمع و باز کردن منو"], [["G", "O"], "سفارش‌های زنده"], [["G", "C"], "مشتری‌ها"], [["G", "D"], "داشبورد"], [["?"], "همین راهنما"], [["Esc"], "بستن پنجره"]];
+export const KEYS = [[["⌘", "K"], "جست‌وجو و پرش به هر جا"], [["/"], "جست‌وجو"], [["["], "جمع و باز کردن منو"], [["G", "O"], "سفارش‌های زنده"], [["G", "C"], "مشتری‌ها"], [["G", "D"], "داشبورد"], [["G", "B"], "خلاصه‌ی امروز"], [["G", "P"], "آزمایشگاه قیمت"], [["G", "L"], "تقویم"], [["?"], "همین راهنما"], [["Esc"], "بستن پنجره"]];
 
 /* --------------------------------------------------------- announcements */
 function annCard() {
@@ -182,7 +182,7 @@ function results(qs) {
   const acts = [
     ["سفارش آزمایشی بزن", "plus", () => X.simOrder()], ["تم تیره و روشن", "moon", () => { const d = document.documentElement.dataset.mode === "dark"; applyTheme(d ? "light" : "dark", true); }],
     ["چاپ گزارش جلسه", "receipt", () => X.printPack()], ["جمع و باز کردن منوی کناری", "grid", () => X.toggleSide()], ["خروجی همه‌ی مشتری‌ها", "dl", () => X.csvExport("customers")],
-    ["بستن صندوق امروز", "cash", () => X.go("cash")], ["میان‌برهای کیبورد", "info", () => helpSheet()],
+    ["بستن صندوق امروز", "cash", () => X.go("cash")], ["میان‌برهای کیبورد", "info", () => helpSheet()], ["حالت تلویزیون برای دفتر", "grid", () => X.tv()], ["خلاصه‌ی امروز", "sun", () => X.go("brief")],
   ].filter(([t]) => has(t)).map(([t, ic, run]) => ({ g: "کارها", ic, t, run }));
   if (!k) {
     const rec = (A().recentC || []).map((id) => searchCustomers(id === "APP" ? X.app().user?.name || "" : id, 1)[0]).filter(Boolean);
@@ -191,9 +191,10 @@ function results(qs) {
   }
   out.push(...secs.slice(0, 5));
   searchCustomers(qs, 5).forEach((c) => out.push({ g: "مشتری‌ها", ic: "profile", t: c.n, s: c.s, run: () => openCustomer(c.id) }));
-  MENU.filter((m) => has(m.name_fa) || has(m.name)).slice(0, 4).forEach((m) => out.push({ g: "منو", ic: "coffee", t: m.name_fa, s: `${kmoney(m.price)} تومان`, run: () => X.go("menu") }));
+  MENU.filter((m) => has(m.name_fa) || has(m.name)).slice(0, 4).forEach((m) => out.push({ g: "منو", ic: "coffee", t: m.name_fa, s: `${kmoney(m.price)} تومان`, run: () => { X.setA({ iid: m.id }); X.go("item"); } }));
   X.boardOrders().filter((o) => has(o.code)).slice(0, 4).forEach((o) => out.push({ g: "سفارش‌های امروز", ic: "receipt", t: `#${digits(o.code)} – ${o.name}`, s: { new: "تازه", brewing: "دارن درستش می‌کنن", ready: "آماده‌ست", done: "تحویل شد" }[o.status], run: () => X.go("orders") }));
-  X.S.staff.filter((p) => X.inScope(p.branch) && (has(p.name_fa) || has(p.name))).slice(0, 4).forEach((p) => out.push({ g: "پرسنل", ic: "users", t: p.name_fa, s: `${p.role_fa} – ${bname(p.branch)}`, run: () => X.go("staff") }));
+  X.S.staff.filter((p) => X.inScope(p.branch) && (has(p.name_fa) || has(p.name))).slice(0, 4).forEach((p) => out.push({ g: "پرسنل", ic: "users", t: p.name_fa, s: `${p.role_fa} – ${bname(p.branch)}`, run: () => { X.setA({ pid: p.id }); X.go("person"); } }));
+  BRANCHES.filter((b) => X.inScope(b.id) && has(loc(b))).forEach((b) => out.push({ g: "شعبه‌ها", ic: "pin", t: `شعبه‌ی ${loc(b)}`, s: "صفحه‌ی کامل شعبه", run: () => { X.setA({ bid: b.id }); X.go("branch"); } }));
   out.push(...acts);
   return out;
 }

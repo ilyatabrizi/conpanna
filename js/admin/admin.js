@@ -15,6 +15,7 @@ import { seed, costOf } from "./seed.js";
 import { initCeo, CEO, wireCeo, alerts, barsH } from "./ceo.js";
 import { initOps, OPS, wireOps, csvExport } from "./ops.js";
 import { initCrm, CRM, wireCrm, openCustomer, crmTitle } from "./crm.js";
+import { initExtra, EXTRA, wireExtra, extraTitle, openBell, tvMode, extraAlerts } from "./extra.js";
 import { initMore, MORE, wireMore, annCard, compareCard, openPalette, helpSheet, cfg } from "./more.js";
 
 const KEY = "conpanna.admin.v1";
@@ -111,17 +112,18 @@ function ding() {
 
 /* ------------------------------------------------------------- sections */
 const GROUPS = [
-  ["امروز", [["overview", "chart", "داشبورد"], ["alerts", "bell", "هشدارها"], ["orders", "receipt", "سفارش‌های زنده"], ["cash", "cash", "صندوق و بستن روز"]]],
-  ["پول", [["sales", "trend", "فروش"], ["finance", "card", "سود و زیان"], ["goals", "flame", "هدف و پیش‌بینی"]]],
-  ["مشتری‌ها", [["customers", "users", "پرونده‌ی مشتری‌ها"], ["insights", "heart", "تحلیل مشتری"], ["marketing", "trend", "بازاریابی و جذب"], ["campaigns", "mega", "کمپین"], ["automations", "bolt", "پیام خودکار"], ["loyalty", "crown", "باشگاه مشتری"], ["reviews", "star", "نظرها"], ["events", "events", "رویدادها"]]],
-  ["منو", [["products", "sparkle", "تحلیل منو"], ["menu", "menu", "منو و قیمت"]]],
-  ["اداره‌ی کافه", [["branches", "pin", "شعبه‌ها"], ["inventory", "layers", "انبار و خرید"], ["staff", "profile", "پرسنل و شیفت"], ["service", "clock", "کیفیت سرویس"], ["tasks", "check", "اطلاعیه و چک‌لیست"]]],
-  ["مدیریت", [["reports", "dl", "گزارش و خروجی"], ["access", "shield", "دسترسی‌ها"], ["settings", "gear", "تنظیمات"]]],
+  ["امروز", [["brief", "sun", "خلاصه‌ی امروز"], ["overview", "chart", "داشبورد"], ["alerts", "bell", "هشدارها"], ["orders", "receipt", "سفارش‌های زنده"], ["cash", "cash", "صندوق و بستن روز"]]],
+  ["پول", [["sales", "trend", "فروش"], ["finance", "card", "سود و زیان"], ["cashflow", "layers", "نقدینگی و پرداخت‌ها"], ["pricing", "tag", "آزمایشگاه قیمت"], ["goals", "flame", "هدف و پیش‌بینی"]]],
+  ["مشتری‌ها", [["customers", "users", "پرونده‌ی مشتری‌ها"], ["insights", "heart", "تحلیل مشتری"], ["tickets", "info", "شکایت و پیگیری"], ["marketing", "trend", "بازاریابی و جذب"], ["campaigns", "mega", "کمپین"], ["automations", "bolt", "پیام خودکار"], ["loyalty", "crown", "باشگاه مشتری"], ["reviews", "star", "نظرها"], ["events", "events", "رویدادها"]]],
+  ["منو", [["products", "sparkle", "تحلیل منو"], ["basket", "bag", "سبد و ترکیب‌ها"], ["menu", "menu", "منو و قیمت"]]],
+  ["اداره‌ی کافه", [["branches", "pin", "شعبه‌ها"], ["leaderboard", "crown", "رتبه‌بندی"], ["inventory", "layers", "انبار و خرید"], ["assets", "gear", "تجهیزات"], ["staff", "profile", "پرسنل و شیفت"], ["staffing", "clock", "نیرو و شلوغی"], ["service", "clock", "کیفیت سرویس"], ["tasks", "check", "اطلاعیه و چک‌لیست"]]],
+  ["مدیریت", [["calendar", "calPlus", "تقویم"], ["docs", "shield", "مجوزها و قراردادها"], ["reports", "dl", "گزارش و خروجی"], ["access", "shield", "دسترسی‌ها"], ["settings", "gear", "تنظیمات"]]],
 ];
 const SECTIONS = GROUPS.flatMap(([, s]) => s);
 const LEAD = {
   overview: "", alerts: "چیزایی که الان باید بهشون برسی.", orders: "", sales: "", finance: "درآمد و خرج و سودت، با همه‌ی جزئیات.", goals: "هدف بذار، ببین کجایی، ببین آخر ماه به کجا می‌رسی.",
   products: "کدوم آیتم‌ها پول درمیارن و کدوم فقط جا گرفتن.", insights: "مشتری‌ها کی‌ان، چقدر برمی‌گردن و کی دارن می‌رن.", inventory: "", staff: "", service: "", tasks: "", reports: "", access: "",
+  brief: "", cashflow: "پول از کجا میاد و کِی باید بره؛ موجودی حساب تو دو ماه آینده.", pricing: "", basket: "", tickets: "هر نظر بد یه پرونده می‌شه تا وقتی حل بشه.", staffing: "", leaderboard: "", assets: "", docs: "قبل از این‌که بازرس بیاد، بدون چی داره منقضی می‌شه.", calendar: "تعطیلی‌ها، پرداخت‌ها، رویدادها و انقضاها همه یه جا.", item: "", person: "", branch: "",
   cash: "آخر شب صندوق رو بشمر و ببند؛ کسری و اضافه همین‌جا معلوم می‌شه.", marketing: "هر تومنی که برای آوردن مشتری خرج می‌کنی، چقدر برمی‌گرده.", customers: "همه‌ی اعضای باشگاه، با هر چی ازشون می‌دونیم.", settings: "", customer: "",
 };
 
@@ -273,7 +275,7 @@ function reviews() {
 
 /* ---------------------------------------------------------------- shell */
 const VIEWS = { orders: orderBoard, menu: menuSec, campaigns, automations, loyalty, events: eventsSec, reviews, ...CEO, ...OPS, ...CRM, ...MORE,
-  tasks: () => annCard() + OPS.tasks(), branches: () => CEO.branches() + compareCard() };
+  tasks: () => annCard() + OPS.tasks(), branches: () => CEO.branches() + compareCard(), ...EXTRA };
 function shell() {
   document.body.innerHTML = `
   <div class="adm" id="adm">
@@ -303,7 +305,7 @@ function shell() {
   $("#menu-btn").addEventListener("click", () => $("#adm").classList.toggle("nav-open"));
   $("#side-col").addEventListener("click", toggleSide);
   $("#ah-search").addEventListener("click", openPalette);
-  $("#ah-bell").addEventListener("click", () => go("alerts"));
+  $("#ah-bell").addEventListener("click", (e) => openBell(e.currentTarget));
   sortable($("#sec"));
   applyUi();
   $("#scrim-side").addEventListener("click", () => $("#adm").classList.remove("nav-open"));
@@ -316,7 +318,7 @@ function render() {
   if (!A.authed) return;
   const el = $("#sec"); if (!el) return;
   if (!VIEWS[A.section]) A.section = "overview";
-  const t = A.section === "customer" ? crmTitle() : SECTIONS.find((s) => s[0] === A.section)[2];
+  const t = A.section === "customer" ? crmTitle() : ["item", "person", "branch"].includes(A.section) ? extraTitle(A.section) : SECTIONS.find((s) => s[0] === A.section)[2];
   $("#a-title").textContent = t;
   document.title = `${t} · پنل کن‌پانا`;
   $("#a-eyebrow").textContent = `${A.scope === "all" ? "همه‌ی شعبه‌ها" : loc(branch(A.scope))} – ${fmtDay(new Date())}`;
@@ -329,7 +331,7 @@ function render() {
   $("#ah-bd").classList.toggle("on", !!al);
   $("#live-dot").hidden = !A.live;
   $$(".nav-i").forEach((b) => b.toggleAttribute("data-near", b.dataset.sec === "customers" && A.section === "customer"));
-  const key = A.section + "|" + (A.section === "customer" ? A.cid : "");
+  const key = A.section + "|" + ({ customer: A.cid, item: A.iid, person: A.pid, branch: A.bid }[A.section] || "");
   if (key === shown) { const y = scrollY; el.innerHTML = VIEWS[A.section](); scrollTo(0, y); wire(el); return; }
   // a new section: show its outline at once, then fill it in
   shown = key;
@@ -367,6 +369,7 @@ function wire(el) {
   wireOps(el);
   wireCrm(el);
   wireMore(el);
+  wireExtra(el);
 }
 
 /* ------------------------------------------------- small things, everywhere */
@@ -442,7 +445,7 @@ addEventListener("keydown", (e) => {
   else if (e.code === "Slash" && e.shiftKey) helpSheet();
   else if (e.code === "BracketLeft" || e.code === "BracketRight") toggleSide();
   else if (e.code === "KeyG") gAt = Date.now();
-  else if (Date.now() - gAt < 1000) { const to = { KeyO: "orders", KeyC: "customers", KeyD: "overview", KeyA: "alerts", KeyS: "sales", KeyF: "finance", KeyI: "inventory", KeyM: "marketing" }[e.code]; gAt = 0; if (to) { e.preventDefault(); go(to); } }
+  else if (Date.now() - gAt < 1000) { const to = { KeyO: "orders", KeyC: "customers", KeyD: "overview", KeyA: "alerts", KeyS: "sales", KeyF: "finance", KeyI: "inventory", KeyM: "marketing", KeyB: "brief", KeyL: "calendar", KeyP: "pricing" }[e.code]; gAt = 0; if (to) { e.preventDefault(); go(to); } }
 });
 // one printable pack for a meeting: dashboard, P&L and branches
 function printPack() {
@@ -491,8 +494,8 @@ function login() {
 
 /* ----------------------------------------------------------------- boot */
 const ctx = { S, A: () => A, setA, render: () => render(), go, inScope, orders, boardOrders, log, stock, checklist, app: appState, printPack,
-  cfg: () => cfg(), sections: () => GROUPS.flatMap(([g, s]) => s.map((x) => [...x, g])), simOrder: () => simOrder(), toggleSide, csvExport, reset: resetAll, applyUi };
-initCeo(ctx); initOps(ctx); initCrm(ctx); initMore(ctx);
+  cfg: () => cfg(), extraAlerts: () => extraAlerts(), setScope: (b) => { setA({ scope: b }); const sc = $("#scope"); if (sc) sc.value = b; render(); }, tv: () => tvMode(), sections: () => GROUPS.flatMap(([g, s]) => s.map((x) => [...x, g])), simOrder: () => simOrder(), toggleSide, csvExport, reset: resetAll, applyUi };
+initCeo(ctx); initOps(ctx); initCrm(ctx); initMore(ctx); initExtra(ctx);
 applyLang();
 applyTheme();
 tips();
